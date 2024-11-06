@@ -2,22 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ingredient;
+use App\Models\Stock;
 use App\Models\Product;
-use App\Models\PurchaseItem;
-use App\Models\PurchasePayment;
-use App\Models\Purchases;
 use App\Models\Settings;
 use App\Models\Supplier;
+use App\Models\Purchases;
+use App\Models\Ingredient;
+use App\Models\PurchaseItem;
 use Illuminate\Http\Request;
+use App\Models\PurchasePayment;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class PurchaseController extends Controller {
+class PurchaseController extends Controller
+{
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index()
+    {
         $title = 'Purchase';
 
         $breadcrumbs = [
@@ -31,7 +35,8 @@ class PurchaseController extends Controller {
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {
+    public function create()
+    {
         $title = 'Purchase';
 
         $breadcrumbs = [
@@ -61,7 +66,88 @@ class PurchaseController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
+    // public function store(Request $request) {
+    //     $validator = Validator::make($request->all(), [
+    //         'date' => 'required',
+    //         'supplier' => 'required',
+    //         'note' => 'nullable',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $all_errors = null;
+
+    //         foreach ($validator->errors()->messages() as $errors) {
+    //             foreach ($errors as $error) {
+    //                 $all_errors .= $error . "<br>";
+    //             }
+    //         }
+
+    //         return response()->json(['success' => false, 'message' => $all_errors]);
+    //     }
+
+    //     // Retrieve products from the request
+    //     $products = json_decode($request->input('products'), true);
+
+    //     if (empty($products)) {
+    //         return response()->json(['success' => false, 'message' => 'Select at least one item']);
+    //     }
+
+    //     try {
+
+    //         // Calculate subtotal
+    //         $subtotal = 0;
+    //         foreach ($products as $product) {
+    //             $subtotal += $product['price'] * $product['quantity'];
+    //         }
+
+    //         // Retrieve other form data
+    //         $date = $request->input('date');
+    //         $supplierId = $request->input('supplier');
+    //         $note = $request->input('note');
+    //         $discount = $request->input('discount');
+    //         $vatPercentage = $request->input('vat_percentage');
+
+    //         // Calculate total after discount and VAT
+    //         $subtotalAfterDiscount = $subtotal - $discount;
+    //         $vatAmount = ($subtotalAfterDiscount * $vatPercentage) / 100;
+    //         $total = $subtotalAfterDiscount + $vatAmount;
+
+    //         $data = [
+    //             'date' => $date,
+    //             'supplier_id' => $supplierId,
+    //             'note' => $note,
+    //             'sub_total' => $subtotal,
+    //             'discount' => $discount,
+    //             'vat' => $vatPercentage,
+    //             'vat_amount' => $vatAmount,
+    //             'total' => $total,
+    //             'created_by' => Auth::user()->id,
+    //         ];
+
+    //         $purchase = Purchases::create($data);
+
+    //         foreach ($products as $product) {
+    //             $data = [
+    //                 'purchase_id' => $purchase->id,
+    //                 'product_id' => $product['id'],
+    //                 'price' => $product['price'],
+    //                 'quantity' => $product['quantity'],
+    //                 'total' => $product['price'] * $product['quantity'],
+    //             ];
+    //             PurchaseItem::create($data);
+    //         }
+
+    //         Supplier::where('id', $supplierId)->increment('balance', $total);
+
+    //         return json_encode(['success' => true, 'message' => 'Purchase created', 'url' => route('purchases.index')]);
+    //     } catch (\Throwable $th) {
+    //         //throw $th;
+    //         return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th]);
+    //     }
+    // }
+
+    public function store(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'date' => 'required',
             'supplier' => 'required',
@@ -82,13 +168,13 @@ class PurchaseController extends Controller {
 
         // Retrieve products from the request
         $products = json_decode($request->input('products'), true);
+        Log::info('Decoded products:', $products);
 
         if (empty($products)) {
             return response()->json(['success' => false, 'message' => 'Select at least one item']);
         }
 
         try {
-
             // Calculate subtotal
             $subtotal = 0;
             foreach ($products as $product) {
@@ -122,29 +208,53 @@ class PurchaseController extends Controller {
             $purchase = Purchases::create($data);
 
             foreach ($products as $product) {
-                $data = [
+                $purchaseItemData = [
                     'purchase_id' => $purchase->id,
                     'product_id' => $product['id'],
                     'price' => $product['price'],
                     'quantity' => $product['quantity'],
                     'total' => $product['price'] * $product['quantity'],
                 ];
-                PurchaseItem::create($data);
+                PurchaseItem::create($purchaseItemData);
+
+                // Retrieve product name by id
+                $productRecord = Ingredient::find($product['id']);
+                $productName = $productRecord ? $productRecord->name : null;
+
+                // if (!$productName) {
+                //     return response()->json(['success' => false, 'message' => 'Product not found']);
+                // }
+
+                // Update or create stock record
+                $stock = Stock::where('name', $productName)->first();
+
+                if ($stock) {
+                    // Update existing stock quantity
+                    $stock->increment('quantity', $product['quantity']);
+                } else {
+                    // Create new stock entry
+                    Stock::create([
+                        'name' => $productName,
+                        'quantity' => $product['quantity'],
+                        'created_by' => Auth::user()->id,
+                    ]);
+                }
             }
 
             Supplier::where('id', $supplierId)->increment('balance', $total);
 
             return json_encode(['success' => true, 'message' => 'Purchase created', 'url' => route('purchases.index')]);
         } catch (\Throwable $th) {
-            //throw $th;
-            return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th]);
+            return json_encode(['success' => false, 'message' => 'Something went wrong! ' . $th->getMessage()]);
         }
     }
+
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {
+    public function show(string $id)
+    {
         $title = 'Purchase';
 
         $data = Purchases::find($id);
@@ -163,7 +273,8 @@ class PurchaseController extends Controller {
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id) {
+    public function edit(string $id)
+    {
         $title = 'Purchase';
 
         $breadcrumbs = [
@@ -185,7 +296,8 @@ class PurchaseController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id) {
+    public function update(Request $request, string $id)
+    {
         // Validate the request data
         $validator = Validator::make($request->all(), [
             'date' => 'required',
@@ -280,7 +392,8 @@ class PurchaseController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id) {
+    public function destroy(string $id)
+    {
         try {
 
             $purchase = Purchases::find($id);
@@ -301,7 +414,8 @@ class PurchaseController extends Controller {
         }
     }
 
-    public function viewAddPayment(string $id) {
+    public function viewAddPayment(string $id)
+    {
         $data = Purchases::find(decrypt($id));
 
         $due = $data->total - $data->paymentSum();
@@ -311,13 +425,15 @@ class PurchaseController extends Controller {
         return view('purchases.payment', compact('data', 'is_edit', 'due'));
     }
 
-    public function viewPayments() {
+    public function viewPayments()
+    {
         $data = PurchasePayment::all();
 
         return view('purchases.payments-modal', compact('data'));
     }
 
-    public function addPayment(Request $request) {
+    public function addPayment(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'date' => 'required',
             'amount' => 'required',
@@ -402,7 +518,8 @@ class PurchaseController extends Controller {
         }
     }
 
-    public function purchaseReport(){
+    public function purchaseReport()
+    {
         $title = 'Purchase Report';
 
         $breadcrumbs = [
@@ -411,6 +528,6 @@ class PurchaseController extends Controller {
         ];
         // $data = Purchases::all();
         $data = Purchases::with(['supplier', 'items.product', 'payments'])->get();
-        return view ('reports.purchaseReports' , compact('data'));
+        return view('reports.purchaseReports', compact('data'));
     }
 }

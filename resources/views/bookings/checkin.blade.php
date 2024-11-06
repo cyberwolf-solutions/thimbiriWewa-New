@@ -48,7 +48,7 @@
                             <th>Checkin Date</th>
                             {{-- <th>Checkout Date</th> --}}
                             <th>Status</th>
-                            <th>Room Cost</th>
+                            <th>Full Price</th>
                             <th>Payed Ammount</th>
                             <th>Due Ammount</th>
                             <th>Action</th>
@@ -85,12 +85,12 @@
                                             </a>
                                         @endcan --}}
                                         @if ($item->status != 'Complete')
-                                            {{-- @can('edit bookings')
-                                                <a href="{{ route('bookings.edit', [$item->id]) }}"
+                                            @can('edit bookings')
+                                                <a href="{{ route('checkin.edit', [$item->id]) }}"
                                                     class="btn btn-secondary btn-sm small btn-icon">
                                                     <i class="bi bi-pencil-square" data-bs-toggle="tooltip" title="Edit"></i>
                                                 </a>
-                                            @endcan --}}
+                                            @endcan
                                             @can('delete bookings')
                                                 <a href="javascript:void(0)"
                                                     data-url="{{ route('checkin.destroy', [$item->id]) }}"

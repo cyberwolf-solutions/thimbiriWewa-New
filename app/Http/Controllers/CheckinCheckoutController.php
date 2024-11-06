@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BordingType;
 use App\Models\Room;
 use App\Models\Booking;
 use App\Models\Customer;
@@ -42,8 +43,9 @@ class CheckinCheckoutController extends Controller
 
         $is_edit = false;
         $data = Booking::where('status', 'OnGoing')->get();
+        $boarding = BordingType::all();
         $data1 = Room::all();
-        return view('bookings.addcheckin', compact('title', 'breadcrumbs', 'data', 'is_edit', 'data1', 'customers'));
+        return view('bookings.addcheckin', compact('title', 'breadcrumbs', 'data', 'is_edit', 'data1', 'customers', 'boarding'));
     }
 
     public function getBookingRooms($customerId)
@@ -83,6 +85,7 @@ class CheckinCheckoutController extends Controller
             'total' => 'required',
             'payed' => 'required',
             'due' => 'required',
+            'bordingtype' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -109,7 +112,7 @@ class CheckinCheckoutController extends Controller
                 'total_amount' => $request->total,
                 'paid_amount' => $request->payed,
                 'due_amount' => $request->due,
-
+                'boardingtype' => $request->bordingtype,
                 'created_by' => Auth::user()->id,
             ]);
 
@@ -120,6 +123,82 @@ class CheckinCheckoutController extends Controller
             return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th]);
         }
     }
+
+
+    public function edit(string $id)
+    {
+        $title = 'Checkin';
+
+        $breadcrumbs = [
+            // ['label' => 'First Level', 'url' => '', 'active' => false],
+            ['label' => $title, 'url' => '', 'active' => true],
+        ];
+
+        // $customers = Customer::with('bookings.rooms')->get();
+        $customers = Customer::whereHas('bookings', function ($query) {
+            $query->where('status', 'OnGoing');
+        })->with('bookings.rooms')->get();
+
+        $is_edit = true;
+        $data = checkincheckout::find($id);
+
+        $roomPrice = Room::where('room_no', $data->room_no)->value('price');
+
+        $boarding = BordingType::all();
+        $data1 = Room::all();
+        return view('bookings.addcheckin', compact('roomPrice', 'title', 'breadcrumbs', 'data', 'is_edit', 'data1', 'customers', 'boarding'));
+    }
+
+
+
+    public function update(Request $request, string $id)
+    {
+
+        //dd($request->all());
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+
+            //'room_no' => 'required',
+            //'checkin' => 'required',
+            'checkout' => 'required',
+            'total' => 'required',
+
+            'due' => 'required',
+
+        ]);
+
+        if ($validator->fails()) {
+            // If validation fails, return error messages
+            $all_errors = null;
+            foreach ($validator->errors()->messages() as $errors) {
+                foreach ($errors as $error) {
+                    $all_errors .= $error . "<br>";
+                }
+            }
+            return response()->json(['success' => false, 'message' => $all_errors]);
+        }
+
+        try {
+            // Create a new Checkin record
+            // Find the existing record by ID
+            $customer = checkincheckout::findOrFail($id);
+
+            // Update the relevant fields
+            $customer->checkout = $request->checkout;
+            $customer->total_amount = $request->total;
+            $customer->due_amount = $request->due;
+
+            // Save the changes
+            $customer->save();
+
+
+
+            return json_encode(['success' => true, 'message' => 'Updated Successfully', 'url' => route('checkin.index')]);
+        } catch (\Throwable $th) {
+            return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th]);
+        }
+    }
+
 
     public function destroy($id)
     {

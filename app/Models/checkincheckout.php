@@ -25,7 +25,8 @@ class checkincheckout extends Model
         'additional_payment',
         'full_payment',
         'note',
-        'full_payed_amount'
+        'full_payed_amount',
+        'boardingtype'
     ];
 
     public function booking()
@@ -46,4 +47,9 @@ class checkincheckout extends Model
     {
         return $this->belongsTo(RoomFacilities::class, 'id');
     }
+
+    public function bordingType()
+{
+    return $this->belongsTo(BordingType::class, 'bordingtype');
+}
 }
