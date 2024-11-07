@@ -71,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase', [ReportsController::class, 'purchase'])->name('purchase.ReportsIndex')->middleware('can:manage report');
     Route::get('/product', [ReportsController::class, 'product'])->name('product.ReportsIndex')->middleware('can:manage report');
     Route::get('/booking', [ReportsController::class, 'booking'])->name('booking.ReportsIndex')->middleware('can:manage report');
+    Route::get('/order', [ReportsController::class, 'order'])->name('order.ReportsIndex')->middleware('can:manage report');
 
 
 

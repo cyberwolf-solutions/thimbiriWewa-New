@@ -7,13 +7,15 @@ use App\Models\Booking;
 use App\Models\Product;
 use App\Models\Customer;
 use App\Models\Employee;
+use App\Models\Order;
 use App\Models\Supplier;
 use App\Models\Purchases;
 use Illuminate\Http\Request;
 
 class ReportsController extends Controller
 {
-    public function user(){
+    public function user()
+    {
         $title = 'User Report';
 
         $breadcrumbs = [
@@ -23,10 +25,11 @@ class ReportsController extends Controller
         $data = User::with('roles')->get();
 
 
-        return view ('reports.Userindex' , compact('title', 'breadcrumbs' , 'data'));
+        return view('reports.Userindex', compact('title', 'breadcrumbs', 'data'));
     }
 
-    public function customer(){
+    public function customer()
+    {
         $title = 'Guest Report';
 
         $breadcrumbs = [
@@ -36,9 +39,10 @@ class ReportsController extends Controller
         $data = Customer::all();
 
 
-        return view ('reports.customerindex' , compact('title', 'breadcrumbs' , 'data'));
+        return view('reports.customerindex', compact('title', 'breadcrumbs', 'data'));
     }
-    public function employee(){
+    public function employee()
+    {
         $title = 'Employees Report';
 
         $breadcrumbs = [
@@ -48,9 +52,10 @@ class ReportsController extends Controller
         $data = Employee::all();
 
 
-        return view ('reports.employeeindex' , compact('title', 'breadcrumbs' , 'data'));
+        return view('reports.employeeindex', compact('title', 'breadcrumbs', 'data'));
     }
-    public function supplier(){
+    public function supplier()
+    {
         $title = 'Supplier Report';
 
         $breadcrumbs = [
@@ -60,9 +65,10 @@ class ReportsController extends Controller
         $data = Supplier::all();
 
 
-        return view ('reports.supplierindex' , compact('title', 'breadcrumbs' , 'data'));
+        return view('reports.supplierindex', compact('title', 'breadcrumbs', 'data'));
     }
-    public function purchase(){
+    public function purchase()
+    {
         $title = 'Purchase Report';
 
         $breadcrumbs = [
@@ -72,9 +78,10 @@ class ReportsController extends Controller
         $data = Purchases::with(['supplier', 'items.product', 'payments'])->get();
 
 
-        return view ('reports.purchaseindex' , compact('title', 'breadcrumbs' , 'data'));
+        return view('reports.purchaseindex', compact('title', 'breadcrumbs', 'data'));
     }
-    public function product(){
+    public function product()
+    {
         $title = 'Product Report';
 
         $breadcrumbs = [
@@ -84,10 +91,11 @@ class ReportsController extends Controller
         $data = Product::with('category')->get();
 
 
-        return view ('reports.productindex' , compact('title', 'breadcrumbs' , 'data'));
+        return view('reports.productindex', compact('title', 'breadcrumbs', 'data'));
     }
 
-    public function booking(){
+    public function booking()
+    {
         $title = 'Booking Report';
 
         $breadcrumbs = [
@@ -95,6 +103,17 @@ class ReportsController extends Controller
             ['label' => $title, 'url' => '', 'active' => true],
         ];
         $data = Booking::all();
-        return view ('reports.bookingindex' , compact('title', 'breadcrumbs' , 'data'));
+        return view('reports.bookingindex', compact('title', 'breadcrumbs', 'data'));
+    }
+    public function order()
+    {
+        $title = 'Order Report';
+
+        $breadcrumbs = [
+            // ['label' => 'First Level', 'url' => '', 'active' => false],
+            ['label' => $title, 'url' => '', 'active' => true],
+        ];
+        $data = Order::all();
+        return view('reports.orderindex', compact('title', 'breadcrumbs', 'data'));
     }
 }
