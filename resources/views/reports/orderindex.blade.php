@@ -36,7 +36,38 @@
         </div>
     </div>
 
+    {{-- <div class="row">
+        <div class="col-4">
+            <select class="form-select" aria-label="Default select example">
+                <option selected>Open this select menu</option>
+                <option value="Dining" selected>Dining</option>
+                <option value="TakeAway">TakeAway</option>
+                <option value="RoomDelivery">Room Delivery</option>
+              </select>
+        </div>
+    </div>
+    --}}
+
+    <div class="row">
+        <div class="col-4">
+            <select class="form-select" id="typeSelect" aria-label="Default select example">
+                <option selected disabled>Select Type</option>
+                <option value="Dining">Dining</option>
+                <option value="TakeAway">TakeAway</option>
+                <option value="RoomDelivery">Room Delivery</option>
+            </select>
+         
+        </div>
+        <div class="col-1">
+            <button type="button" class="btn btn-dark" onclick="window.location.href='{{ route('order.ReportsIndex') }}'">
+                <i class="bi bi-arrow-repeat"></i>
+
+            </button>
+        </div>
+        
+    </div>
     <div class="row mt-3">
+
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
@@ -56,45 +87,45 @@
                         </thead>
                         <tbody>
                             @foreach ($data as $key => $item)
-                            <tr>
-                                <td>{{ $key + 1 }}</td>
-                                <td>#{{ $settings->invoice($item->id) }}</td>
-                                @if ($item->customer_id == 0)
-                                    <td>Walking Customer</td>
-                                @else
-                                    <td>{{ $item->customer->name }}</td>
-                                @endif
-                                <td>{{ \Carbon\Carbon::parse($item->order_date)->format($settings->date_format) }}</td>
-                                <td>{{ $settings->currency }}
-                                    {{ number_format($item->payment ? $item->payment->total : 0, 2) }}
-                                </td>
-                                <td>{{ $item->status }}</td>
-                                <td>{{ $item->type }}</td>
-                                <td>{{ $item->table_id != 0 ? $item->table->availability : 'No Table' }}</td>
-                                <td>
-                                    @can('view orders')
-                                        <a href="javascript:void(0)" data-url="{{ route('orders.show', [$item->id]) }}"
-                                            data-title="View Order" data-size="xl" data-location="centered"
-                                            data-ajax-popup="true" data-bs-toggle="tooltip" title="View Order"
-                                            class="btn btn-sm btn-light"><i class="mdi mdi-eye"></i>
-                                        </a>
-                                    @endcan
-                                    <a href="{{ route('order.print', [$item->id]) }}" target="__blank"
-                                        class="btn btn-sm btn-soft-warning ms-1" data-bs-toggle="tooltip"
-                                        title="Print">
-                                        <i class="mdi mdi-printer"></i>
-                                    </a>
-                                    @if ($item->table_id != 0)
-                                        <a href="javascript:void(0)" data-url="{{ route('order.complete') }}"
-                                            data-data='{"id":{{ $item->id }}}'
-                                            class="btn btn-sm btn-soft-success ms-1 send-post-ajax"
-                                            data-bs-toggle="tooltip" title="Complete">
-                                            <i class="mdi mdi-check"></i>
-                                        </a>
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>#{{ $settings->invoice($item->id) }}</td>
+                                    @if ($item->customer_id == 0)
+                                        <td>Walking Customer</td>
+                                    @else
+                                        <td>{{ $item->customer->name }}</td>
                                     @endif
-                                </td>
-                            </tr>
-                        @endforeach
+                                    <td>{{ \Carbon\Carbon::parse($item->order_date)->format($settings->date_format) }}</td>
+                                    <td>{{ $settings->currency }}
+                                        {{ number_format($item->payment ? $item->payment->total : 0, 2) }}
+                                    </td>
+                                    <td>{{ $item->status }}</td>
+                                    <td>{{ $item->type }}</td>
+                                    <td>{{ $item->table_id != 0 ? $item->table->availability : 'No Table' }}</td>
+                                    <td>
+                                        @can('view orders')
+                                            <a href="javascript:void(0)" data-url="{{ route('orders.show', [$item->id]) }}"
+                                                data-title="View Order" data-size="xl" data-location="centered"
+                                                data-ajax-popup="true" data-bs-toggle="tooltip" title="View Order"
+                                                class="btn btn-sm btn-light"><i class="mdi mdi-eye"></i>
+                                            </a>
+                                        @endcan
+                                        <a href="{{ route('order.print', [$item->id]) }}" target="__blank"
+                                            class="btn btn-sm btn-soft-warning ms-1" data-bs-toggle="tooltip"
+                                            title="Print">
+                                            <i class="mdi mdi-printer"></i>
+                                        </a>
+                                        @if ($item->table_id != 0)
+                                            <a href="javascript:void(0)" data-url="{{ route('order.complete') }}"
+                                                data-data='{"id":{{ $item->id }}}'
+                                                class="btn btn-sm btn-soft-success ms-1 send-post-ajax"
+                                                data-bs-toggle="tooltip" title="Complete">
+                                                <i class="mdi mdi-check"></i>
+                                            </a>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                             {{-- @foreach ($data as $key => $item)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
@@ -113,6 +144,36 @@
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $('#typeSelect').change(function() {
+            var selectedType = $(this).val();
+            window.location.href = "/search-by-type?type=" + selectedType;
+        });
+
+        // $(document).ready(function() {
+
+        //     $('#typeSelect').change(function() {
+        //         var selectedType = $(this).val();
+        //         $.ajax({
+        //             url: "{{ route('search.by.type') }}",
+        //             method: 'GET',
+        //             data: {
+        //                 type: selectedType
+        //             },
+        //             success: function(response) {
+        //                 console.log(response); // Process the response and display the data
+        //                 // You could display the results in a table here.
+        //             },
+        //             error: function(xhr) {
+        //                 alert("An error occurred: " + xhr.statusText);
+        //                 console.error("An error occurred: " + xhr.statusText);
+        //             }
+        //         });
+        //     });
+        // });
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('printButton').addEventListener('click', function() {
@@ -172,7 +233,7 @@
                 printWindow.document.write('<div class="container-fluid">');
                 printWindow.document.write(
                     '<img src="{{ asset('storage/' . $settings->logo_dark) }}" class="logo img-fluid">'
-                    );
+                );
                 printWindow.document.write('<div class="resort-name">Thimbiri Wewa Resort</div>');
                 printWindow.document.write('<hr>');
                 printWindow.document.write('<h4>Users Report</h4>');

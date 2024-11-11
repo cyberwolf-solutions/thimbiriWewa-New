@@ -116,4 +116,25 @@ class ReportsController extends Controller
         $data = Order::all();
         return view('reports.orderindex', compact('title', 'breadcrumbs', 'data'));
     }
+
+    public function searchByType(Request $request)
+    {
+        $title = 'Order Report';
+
+        $breadcrumbs = [
+            // ['label' => 'First Level', 'url' => '', 'active' => false],
+            ['label' => $title, 'url' => '', 'active' => true],
+        ];
+        $type = $request->type;
+        if ($type === 'All') {
+            $data = Order::all(); // Fetch all orders when "All" is selected
+        } else {
+            $data = Order::where('type', $type)->get(); // Filter by the selected type
+        }
+        // $data = Order::where('type', $type)->get();
+
+        // return response()->json($data);
+        return view('reports.orderindex', compact('title', 'breadcrumbs', 'data'));
+
+    }
 }
