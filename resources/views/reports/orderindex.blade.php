@@ -46,14 +46,56 @@
                                 <th>#</th>
                                 <th>Id</th>
                                 <th>Customer</th>
-                                <th>Room</th>
                                 <th>Date</th>
-                                <th>Table</th>
+                                <th>Price</th>
+                                <th>Status</th>
                                 <th>Type</th>
+                                <th>Table</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($data as $key => $item)
+                            <tr>
+                                <td>{{ $key + 1 }}</td>
+                                <td>#{{ $settings->invoice($item->id) }}</td>
+                                @if ($item->customer_id == 0)
+                                    <td>Walking Customer</td>
+                                @else
+                                    <td>{{ $item->customer->name }}</td>
+                                @endif
+                                <td>{{ \Carbon\Carbon::parse($item->order_date)->format($settings->date_format) }}</td>
+                                <td>{{ $settings->currency }}
+                                    {{ number_format($item->payment ? $item->payment->total : 0, 2) }}
+                                </td>
+                                <td>{{ $item->status }}</td>
+                                <td>{{ $item->type }}</td>
+                                <td>{{ $item->table_id != 0 ? $item->table->availability : 'No Table' }}</td>
+                                <td>
+                                    @can('view orders')
+                                        <a href="javascript:void(0)" data-url="{{ route('orders.show', [$item->id]) }}"
+                                            data-title="View Order" data-size="xl" data-location="centered"
+                                            data-ajax-popup="true" data-bs-toggle="tooltip" title="View Order"
+                                            class="btn btn-sm btn-light"><i class="mdi mdi-eye"></i>
+                                        </a>
+                                    @endcan
+                                    <a href="{{ route('order.print', [$item->id]) }}" target="__blank"
+                                        class="btn btn-sm btn-soft-warning ms-1" data-bs-toggle="tooltip"
+                                        title="Print">
+                                        <i class="mdi mdi-printer"></i>
+                                    </a>
+                                    @if ($item->table_id != 0)
+                                        <a href="javascript:void(0)" data-url="{{ route('order.complete') }}"
+                                            data-data='{"id":{{ $item->id }}}'
+                                            class="btn btn-sm btn-soft-success ms-1 send-post-ajax"
+                                            data-bs-toggle="tooltip" title="Complete">
+                                            <i class="mdi mdi-check"></i>
+                                        </a>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                            {{-- @foreach ($data as $key => $item)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>{{ $item->customer_id }}</td>
@@ -62,18 +104,9 @@
                                     <td>{{ $item->table_id }}</td>
                                     <td>{{ $item->orderable_type }}</td>
                                     <td>{{ $item->orderable_id }}</td>
-                                    {{-- <td>
-                                        @foreach ($item->roles as $role)
-                                            {{ $role->name }}@if (!$loop->last)
-                                                ,
-                                            @endif
-                                        @endforeach
-                                    </td> --}}
-                                    {{-- <td class="{{ $item->is_active == 1 ? 'status-active' : 'status-inactive' }}">
-                                        {{ $item->is_active == 1 ? 'Active' : 'Inactive' }}
-                                    </td> --}}
+                                  
                                 </tr>
-                            @endforeach
+                            @endforeach --}}
                         </tbody>
                     </table>
                 </div>
