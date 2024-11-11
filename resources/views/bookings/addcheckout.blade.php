@@ -118,6 +118,17 @@
                             <textarea name="note" id="note" class="form-control" placeholder="Additional" required></textarea>
                         </div>
 
+                        <div class="col-md-6 mb-3 required">
+                            <label for="payment-method" class="form-label">Payment Method</label>
+                            <select name="payment_method" id="payment-method" class="form-control" required>
+                                <option value="">Select...</option>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="travel_agent">Travel Agent</option>
+                            </select>
+                        </div>
+                        
+
 
 
                         <div class="col-md-6 mb-3 required">
@@ -125,6 +136,21 @@
                             <input type="text" name="fd" id="fd" class="form-control" value=""
                                 placeholder="Full due" required readonly />
                         </div>
+
+
+                        <div class="col-md-6 mb-3 required">
+                            <label for="" class="form-label">Discount (%)</label>
+                            <input type="text" name="dis" id="dis" class="form-control" value=""
+                                placeholder="Discount" required />
+                        </div>
+
+
+                        <div class="col-md-6 mb-3 required">
+                            <label for="" class="form-label">Sub Total</label>
+                            <input type="text" name="stot" id="stot" class="form-control" value=""
+                                placeholder="Discount" required  readonly/>
+                        </div>
+
 
                         <div class="col-md-6 mb-3 required">
                             <label for="" class="form-label">Paying ammmount</label>
@@ -433,6 +459,26 @@
 
 
             }
+
+
+            function calculateDiscountedSubtotal() {
+                var total = parseFloat($('#total').val()) || 0;
+                var additional = parseFloat($('#additional').val()) || 0;
+                var payed = parseFloat($('#payed').val()) || 0;
+                var discountPercentage = parseFloat($('#dis').val()) || 0;
+
+                // Calculate discounted amount
+                var discountAmount = (total + additional) * (discountPercentage / 100);
+                var discountedTotal = (total + additional) - discountAmount;
+
+                // Calculate subtotal after subtracting the payed amount
+                var subtotal = discountedTotal - payed;
+
+                $('#stot').val(subtotal.toFixed(2));
+            }
+
+            $('#dis').on('input', calculateDiscountedSubtotal);
+            $('#total, #additional, #payed').on('input', calculateDiscountedSubtotal);
 
             $('form.ajax-form').submit(function(event) {
                 event.preventDefault();
