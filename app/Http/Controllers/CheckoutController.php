@@ -70,12 +70,9 @@ class CheckoutController extends Controller
 
 
         $unpaidOrders = OrderPayment::whereIn('order_id', $orderIds)
-            ->where('payment_status', 'Unpaid')
-            ->get();
-
-
-
-
+        ->whereIn('payment_status', ['Unpaid', 'Canceled'])
+        ->get();
+    
         return response()->json([
             'orders' => $orders,
             'orderIds' => $orderIds,

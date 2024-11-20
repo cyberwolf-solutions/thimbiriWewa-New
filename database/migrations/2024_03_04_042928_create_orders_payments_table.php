@@ -17,11 +17,12 @@ return new class extends Migration
             $table->string('date');
             $table->float('sub_total')->default(0);
             $table->float('vat')->nullable();
+            $table->float('service')->nullable();
             $table->float('discount')->nullable();
             $table->float('total')->default(0);
             $table->enum('payment_type', ['Cash', 'Card'])->default('Cash');
             $table->text('description')->nullable();
-            $table->enum('payment_status', ['Unpaid', 'Partially Paid', 'Paid'])->default('Unpaid');
+            $table->enum('payment_status', ['Unpaid', 'Partially Paid', 'Paid','Cancel'])->default('Unpaid');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();

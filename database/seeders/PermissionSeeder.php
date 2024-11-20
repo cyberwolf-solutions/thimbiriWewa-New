@@ -63,6 +63,7 @@ class PermissionSeeder extends Seeder {
             ['name' => 'delete purchases', 'guard_name' => 'web'],
             ['name' => 'manage pos', 'guard_name' => 'web'],
             ['name' => 'manage kitchen', 'guard_name' => 'web'],
+            ['name' => 'delete kitchen', 'guard_name' => 'web'],
             ['name' => 'manage bar', 'guard_name' => 'web'],
             ['name' => 'manage tables', 'guard_name' => 'web'],
             ['name' => 'create tables', 'guard_name' => 'web'],
@@ -105,7 +106,7 @@ class PermissionSeeder extends Seeder {
             ['name' => 'view orders', 'guard_name' => 'web'],
             ['name' => 'edit orders', 'guard_name' => 'web'],
             ['name' => 'delete orders', 'guard_name' => 'web'],
-
+            ['name' => 'delete KOT', 'guard_name' => 'web'],
             ['name' => 'User report', 'guard_name' => 'web'],
             ['name' => 'Customer report', 'guard_name' => 'web'],
             ['name' => 'Supplier report', 'guard_name' => 'web'],

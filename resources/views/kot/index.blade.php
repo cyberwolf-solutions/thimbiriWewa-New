@@ -62,6 +62,7 @@
                             <div class="card border">
                                 <div class="card-header">
                                     <div class="row align-items -center">
+
                                         <div class="col">
                                             <h5>#{{ $settings->invoice($item->id) }} <span class="fw-normal fs-6">|
                                                     {{ $item->table_id != 0 ? $item->table->name : 'No Table' }}</span>
@@ -140,6 +141,20 @@
 
                                         </ul>
                                     </div>
+
+                                    @can('delete KOT')
+                                  
+                                    <form action="{{ route('kot.delete', $meal->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this KOT?');">
+                                        @csrf
+                                        @method('POST')
+
+                                    <button class="btn btn-danger btn-sm d-flex align-items-center">
+                                        <i class="bi bi-trash me-1"></i> Delete
+                                    </button>
+                                </form>
+
+                                @endcan
+                                
                                 </div>
                             </div>
                             <!-- Repeat similar structure for other items -->
