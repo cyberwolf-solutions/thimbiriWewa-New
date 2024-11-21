@@ -43,8 +43,8 @@
                             <th>#</th>
                             <th>Customer Name</th>
                             <th>Room No</th>
-                            <th>Room Facility Type</th>
-                            <th>Room Type</th>
+                            {{-- <th>Room Facility Type</th> --}}
+                            {{-- <th>Room Type</th> --}}
                             <th>Checkin Date</th>
                             {{-- <th>Checkout Date</th> --}}
                             <th>Status</th>
@@ -63,8 +63,8 @@
                                     <td>{{$item->id}}</td>
                                     <td>{{$item->customer->name}}</td>
                                     <td>{{$item->room_no}}</td>
-                                    <td>{{$item->room_facility_type}}</td>
-                                    <td>{{$item->roomType->name}}</td>
+                                    {{-- <td>{{$item->room_facility_type}}</td> --}}
+                                    {{-- <td>{{$item->roomType->name}}</td> --}}
                                     <td>{{$item->checkin}}</td>
                                     {{-- <td>{{$item->status}}</td> --}}
                                     <td>Checked-In</td>

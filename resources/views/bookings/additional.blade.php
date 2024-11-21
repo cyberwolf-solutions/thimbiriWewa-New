@@ -51,14 +51,18 @@
                         <p>{{ $checkinCheckout->room_no }}</p>
                     </div>
 
-                    <div class="col">
+                    {{-- <div class="col">
                         <h6>Room</h6>
                         @php
 
                             $roomName = App\Models\Room::where('room_no', $checkinCheckout->room_no)->value('name');
                         @endphp
                         <p>{{ $roomName }} - {{ $checkinCheckout->roomfacility->name }}</p>
-                    </div>
+                    </div> --}}
+                    @php
+
+                        $roomName = App\Models\Room::where('room_no', $checkinCheckout->room_no)->value('name');
+                    @endphp
                 @endif
 
             </div>
@@ -101,9 +105,11 @@
                                 @endforeach
                             @endforeach
                         </tbody>
-                        
+
                         <tr>
-                            <td colspan="6"><hr></td> 
+                            <td colspan="6">
+                                <hr>
+                            </td>
                         </tr>
 
 
@@ -123,12 +129,14 @@
                             </tr>
 
                             <tr>
-                                <td colspan="6"><hr></td> 
+                                <td colspan="6">
+                                    <hr>
+                                </td>
                             </tr>
 
-                            
+
                         </tfoot>
-                        
+
                     </table>
                 </div>
             </div>

@@ -158,9 +158,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-room-facility/{facilityId}', [CheckinCheckoutController::class, 'getRoomFacility'])->name('get-room-facility');
 
     Route::resource('checkout', CheckoutController::class)->middleware('can:manage bookings');
-    Route::get('/get-booking-payment-details/{bookingId}', [CheckoutController::class, 'getBookingPaymentDetails']);
+    Route::get('/get-booking-payment-details/{bookingId}/{roomId}', [CheckoutController::class, 'getBookingPaymentDetails']);
 
-    Route::get('/get-customer-orders/{customerId}', [CheckoutController::class, 'getCustomerOrders']);
+    Route::get('/get-customer-orders/{customerId}/{roomId}', [CheckoutController::class, 'getCustomerOrders']);
     Route::get('/get-checkincheckout-id',  [CheckoutController::class, 'getCheckinCheckoutId'] )->name('get.checkincheckout.id');
     
     

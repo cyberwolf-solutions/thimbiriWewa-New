@@ -66,51 +66,51 @@
                                 <option value="">Select...</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Booking Id</label>
                             <input type="text" name="booking_id" id="booking_id" class="form-control"
                                 placeholder="Room Facility" required readonly />
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Room Facility</label>
                             <input type="text" name="room_facility" id="room-facility" class="form-control"
-                                placeholder="Room Facility" required readonly />
+                                placeholder="Room Facility" required readonly hidden />
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Room No</label>
                             <input type="text" name="room_no" id="room-no" class="form-control" value=""
-                                placeholder="Enter Room No" required readonly />
+                                placeholder="Enter Room No" required readonly hidden />
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Check In Date</label>
                             <input type="text" name="checkin" id="checkin" class="form-control" value=""
-                                placeholder="Check In Date" required readonly />
+                                placeholder="Check In Date" required readonly hidden />
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Check Out Date</label>
                             <input type="text" name="checkout" id="checkout" class="form-control" value=""
-                                placeholder="Check In Date" required readonly />
+                                placeholder="Check In Date" required readonly hidden />
                         </div>
-                        <div class="col-md-6 mb-3 required">
-                            <label for="" class="form-label">Total ammount (LKR.)</label>
+                        <div class="col-md-6 mb-3 required d-none">
+                            <label for="" class="form-label">Total Room Charge (LKR.)</label>
                             <input type="text" name="total" id="total" class="form-control" value=""
-                                placeholder="Total" required readonly />
+                                placeholder="Total" required readonly hidden />
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Payed amount (LKR.)</label>
                             <input type="text" name="payed" id="payed" class="form-control" value=""
-                                placeholder="Payed" required readonly />
+                                placeholder="Payed" required readonly hidden />
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Due amount (LKR.)</label>
                             <input type="text" name="due" id="due" class="form-control" value=""
-                                placeholder="Due" required readonly />
+                                placeholder="Due" required readonly hidden />
                         </div>
 
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Additional payments</label>
                             <input type="text" name="additional" id="additional" class="form-control" value=""
-                                placeholder="Additional" required readonly />
+                                placeholder="Additional" required readonly hidden />
                         </div>
 
                         <div class="col-md-6 mb-3 required">
@@ -127,14 +127,14 @@
                                 <option value="travel_agent">Travel Agent</option>
                             </select>
                         </div>
-                        
 
 
 
-                        <div class="col-md-6 mb-3 required">
+
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Full due ammount</label>
                             <input type="text" name="fd" id="fd" class="form-control" value=""
-                                placeholder="Full due" required readonly />
+                                placeholder="Full due" readonly hidden />
                         </div>
 
 
@@ -145,17 +145,17 @@
                         </div>
 
 
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Sub Total</label>
                             <input type="text" name="stot" id="stot" class="form-control" value=""
-                                placeholder="Discount" required  readonly/>
+                                placeholder="Discount" required readonly hidden />
                         </div>
 
 
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required d-none">
                             <label for="" class="form-label">Paying ammmount</label>
                             <input type="text" name="tot" id="tot" class="form-control" value=""
-                                placeholder="Ammount" required />
+                                placeholder="Ammount" />
                         </div>
 
                         <input type="hidden" name="checkincheckout_id" id="checkincheckout_id" readonly>
@@ -163,13 +163,45 @@
                     </div>
 
 
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="room-details-table">
+                            <thead>
+                                <tr>
+                                    <th>Room No</th>
+                                    <th>Room Facility</th>
+                                    {{-- <th>Check In</th>
+                                    <th>Check Out</th> --}}
+                                    <th>Total Room Charge (LKR)</th>
+
+                                    {{-- <th>Due Amount (LKR)</th> --}}
+                                    <th>Additional Payments (LKR)</th>
+                                    <th>Paid (LKR)</th>
+                                    <th>Due (LKR)</th>
+                                    <th>Sub Total (LKR)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamically added room details will appear here -->
+                            </tbody>
+                        </table>
+
+                        <input type="hidden" name="rooms_data" id="rooms-data">
+                    </div>
+
+
+                    <div class="col-md-6 mb-3 required ">
+                        <label for="" class="form-label">Total (LKR)</label>
+                        <input type="text" name="Total" id="Total" class="form-control" value=""
+                            placeholder="Ammount" required />
+                    </div>
 
 
                     <div class="row mb-3">
                         <div class="col-12 text-end">
                             <button type="button" class="btn btn-light me-2"
                                 onclick="window.location='{{ route('checkout.index') }}'">Cancel</button>
-                            <button class="btn btn-primary">Create</button>
+                            <button class="btn btn-primary" id="create-btn">Create</button>
                         </div>
                     </div>
                 </form>
@@ -183,7 +215,133 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <Script>
+        $(document).ready(function() {
+            // Function to calculate and update the due amount, subtotal, and total
+            function updateDiscountedPrices() {
+                var discountPercentage = parseFloat($('#dis').val()) || 0;
+                var totalSum = 0; // To store the sum of all subtotals
 
+                $('#room-details-table tbody tr').each(function() {
+                    var totalRoomCharge = parseFloat($(this).find('td:eq(2)').text()) || 0;
+                    var additionalPayments = parseFloat($(this).find('td:eq(3)').text()) || 0;
+                    var paidAmount = parseFloat($(this).find('td:eq(4)').text()) || 0;
+
+                    // Calculate subtotal after applying discount
+                    var subtotal = (totalRoomCharge + additionalPayments) * (1 - discountPercentage / 100);
+                    var dueAmount = subtotal - paidAmount;
+
+                    // Handle potential negative due amounts
+                    dueAmount = dueAmount < 0 ? 0 : dueAmount;
+
+                    // Update the Due and Subtotal fields in the table
+                    $(this).find('td:eq(5)').text(dueAmount.toFixed(2)); // Update Due Amount
+                    $(this).find('td:eq(6)').text(subtotal.toFixed(2)); // Update Subtotal
+
+                    // Add the subtotal to the total sum
+                    totalSum += subtotal;
+                });
+
+                // Update the Total field with the sum of all subtotals
+                $('#Total').val(totalSum.toFixed(2));
+            }
+
+            // Event listener for discount input
+            $('#dis').on('input', function() {
+                updateDiscountedPrices(); // Recalculate prices whenever discount changes
+            });
+
+
+            // Handle adding a new room (existing code for adding a room)
+            $('#booking-room-select').change(function() {
+                setTimeout(function() {
+                    var selectedRoom = $('#booking-room-select').find(':selected');
+                    var roomNo = selectedRoom.data('room-no');
+                    var roomFacility = $('#room-facility').val();
+                    var totalAmount = parseFloat($('#total').val()) || 0;
+                    var paidAmount = parseFloat($('#payed').val()) || 0;
+                    var additionalPayments = parseFloat($('#additional').val()) || 0;
+
+
+                    var roomExists = false;
+                $('#room-details-table tbody tr').each(function() {
+                    if ($(this).find('td:eq(0)').text() == roomNo) {
+                        roomExists = true;
+                        return false; // Exit loop
+                    }
+                });
+
+                if (roomExists) {
+                    alert('This room is already added to the table. Please remove it first to add again.');
+                    return; // Prevent adding duplicate room
+                }
+
+
+
+                    var dueAmount = totalAmount - paidAmount + additionalPayments;
+                    var subtotal = totalAmount +
+                        additionalPayments; // Initial subtotal before discount
+
+                    // Create a new row with the selected room details
+                    var rowHtml = `<tr>
+            <td>${roomNo}</td>
+            <td>${roomFacility}</td>
+            <td>${totalAmount.toFixed(2)}</td>
+            <td>${additionalPayments.toFixed(2)}</td>
+            <td>${paidAmount.toFixed(2)}</td>
+            <td>${dueAmount.toFixed(2)}</td>
+            <td>${subtotal.toFixed(2)}</td>
+            <td><button type="button" class="btn btn-danger remove-room">Remove</button></td>
+        </tr>`;
+
+                    // Append the new row to the table
+                    $('#room-details-table tbody').append(rowHtml);
+
+                    // Clear form fields
+                    $('#room-facility').val('');
+                    $('#total').val('');
+                    $('#payed').val('');
+                    $('#additional').val('');
+
+                    // Recalculate discounted prices after adding the new row
+                    updateDiscountedPrices();
+                }, 2000); // 2000ms = 2 seconds
+            });
+
+            // Handle removing a room from the table
+            $('#room-details-table').on('click', '.remove-room', function() {
+                $(this).closest('tr').remove();
+                updateDiscountedPrices(); // Recalculate after removing a row
+            });
+
+            // When the Create button is clicked, store table data and alert it
+            $('#create-btn').click(function() {
+                var tableData = [];
+
+                // Loop through each row in the table and collect the data
+                $('#room-details-table tbody tr').each(function() {
+                    var rowData = {
+                        roomNo: $(this).find('td:eq(0)').text(),
+                        roomFacility: $(this).find('td:eq(1)').text(),
+                        totalRoomCharge: $(this).find('td:eq(2)').text(),
+                        additionalPayments: $(this).find('td:eq(3)').text(),
+                        paidAmount: $(this).find('td:eq(4)').text(),
+                        dueAmount: $(this).find('td:eq(5)').text(),
+                        subtotal: $(this).find('td:eq(6)').text()
+                    };
+                    tableData.push(rowData);
+                });
+
+                // Store the table data in the hidden input field
+                $('#rooms-data').val(JSON.stringify(tableData));
+
+                // Alert the table data (you can also log it to the console if you prefer)
+                // alert('Table Data: ' + JSON.stringify(tableData));
+            });
+
+            updateDiscountedPrices();
+        });
+    </Script>
 
 
 
@@ -300,29 +458,60 @@
 
 
 
+            // $('#booking-room-select').change(function() {
+            //     var bookingId = $('#booking_id').val();
+
+            //     // Send AJAX request to fetch paid and due amounts for the selected booking
+            //     $.ajax({
+            //         url: '/get-booking-payment-details/' + bookingId,
+            //         type: 'GET',
+            //         success: function(response) {
+            //             $('#payed').val(response.payed);
+            //             $('#total').val(response.total);
+
+            //             //   var   pvalue = parseFloat(response.payed);
+
+            //             calculateDue();
+            //             calculateFullDue();
+
+
+            //         },
+            //         error: function(xhr, status, error) {
+            //             console.error(xhr.responseText);
+            //         }
+            //     });
+            // });
+
+
+
             $('#booking-room-select').change(function() {
                 var bookingId = $('#booking_id').val();
 
-                // Send AJAX request to fetch paid and due amounts for the selected booking
-                $.ajax({
-                    url: '/get-booking-payment-details/' + bookingId,
-                    type: 'GET',
-                    success: function(response) {
-                        $('#payed').val(response.payed);
-                        // $('#due').val(response.due);
+                // Delay the retrieval of roomId by 4 seconds (4000 milliseconds)
+                setTimeout(function() {
+                    var roomId = $('#room-no').val();
 
-                        //   var   pvalue = parseFloat(response.payed);
+                    // alert(roomId); // Display the roomId value in an alert
 
-                        calculateDue();
-                        calculateFullDue();
+                    // Send AJAX request to fetch paid and due amounts for the selected booking
+                    $.ajax({
+                        url: '/get-booking-payment-details/' + bookingId + '/' + roomId,
+                        type: 'GET',
+                        success: function(response) {
+                            $('#payed').val(response.payed);
+                            $('#total').val(response.total);
 
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                    }
-                });
+                            calculateDue();
+                            calculateFullDue();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }, 1000); // 4 seconds delay
             });
+
+
 
 
             $('#booking-room-select').change(function() {
@@ -331,7 +520,7 @@
             });
             $('#booking-room-select').change(function() {
                 var totalAmount = $(this).find(':selected').data('total-ammount');
-                $('#total').val(totalAmount);
+                // $('#total').val(totalAmount);
             });
             $('#booking-room-select').change(function() {
                 var checkinDate = $(this).find(':selected').data('checkin');
@@ -346,17 +535,7 @@
 
 
             $(document).ready(function() {
-                // Function to calculate due amount
-                // function calculateDue() {
-                //     var total = parseFloat($('#total').val());
-                //     var payed = parseFloat($('#payed').val());
 
-
-                //     va due = total - payed;
-
-
-                //     $('#due').val(due.toFixed(2));r
-                // }
 
 
                 $('#payed').on('input', function() {
@@ -376,60 +555,52 @@
 
 
 
+            let customerSelected = false;
+            let roomSelected = false;
+
             $('#customer-select').change(function() {
-                var customerId = $(this).val();
-
-
-                $.ajax({
-                    url: '/get-customer-orders/' + customerId,
-                    type: 'GET',
-                    success: function(response) {
-                        // Display the orders in an alert
-                        // var orders = '';
-                        // if (response.orders.length > 0) {
-                        //     response.orders.forEach(function(order) {
-                        //         orders += 'Order ID: ' + order.id + ', Type: ' + order
-                        //             .type + '\n';
-                        //     });
-                        // } else {
-                        //     orders = 'No orders found for this customer.';
-                        // }
-
-
-
-
-
-                        // Access orderIds from the response
-                        // var orderIds = response.orderIds;
-                        var unpaidOrders = response.unpaidOrders;
-
-                        var totalSum = 0;
-
-                        var unpaidOrdersDetails = '';
-                        if (unpaidOrders.length > 0) {
-
-                            unpaidOrders.forEach(function(order) {
-                                var amount = parseFloat(order.total);
-                                totalSum += amount;
-                            });
-
-                            unpaidOrdersDetails = totalSum;
-                        }
-
-
-
-                        $('#additional').val(totalSum);
-
-
-
-
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                    }
-                });
+                customerSelected = true;
+                triggerCustomerOrders();
             });
+
+            $('#booking-room-select').change(function() {
+                roomSelected = true;
+                triggerCustomerOrders();
+            });
+
+            function triggerCustomerOrders() {
+                if (customerSelected && roomSelected) {
+                    var customerId = $('#customer-select').val();
+                    var roomId = $('#room-no').val();
+
+                    if (customerId && roomId) {
+                        $.ajax({
+                            url: '/get-customer-orders/' + customerId + '/' + roomId,
+                            type: 'GET',
+                            success: function(response) {
+                                var unpaidOrders = response.unpaidOrders;
+                                var totalSum = 0;
+                                var unpaidOrdersDetails = '';
+
+                                if (unpaidOrders.length > 0) {
+                                    unpaidOrders.forEach(function(order) {
+                                        var amount = parseFloat(order.total);
+                                        totalSum += amount;
+                                    });
+
+                                    unpaidOrdersDetails = totalSum;
+                                }
+
+                                $('#additional').val(totalSum);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                }
+            }
+
 
 
             function calculateDue() {
