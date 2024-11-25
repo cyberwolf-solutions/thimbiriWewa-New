@@ -112,6 +112,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/restaurant-customer-add', [RestaurantController::class, 'customerAdd'])->name('restaurant.customer-add');
     Route::get('/restaurant-discount', [RestaurantController::class, 'discount'])->name('restaurant.discount');
     Route::get('/restaurant-vat', [RestaurantController::class, 'vat'])->name('restaurant.vat');
+    Route::get('/restaurant-service', [RestaurantController::class, 'service'])->name('restaurant.service');
     Route::get('/restaurant-modifiers', [RestaurantController::class, 'modifiers'])->name('restaurant.modifiers');
     Route::post('/restaurant/checkout', [RestaurantController::class, 'checkout'])->name('restaurant.checkout');
     Route::resource('kitchen', KitchenController::class)->middleware('can:manage kitchen');
@@ -121,6 +122,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('orders', OrderController::class)->middleware('can:manage orders');
     Route::get('order/print/{id}', [OrderController::class, 'print'])->middleware('can:manage orders')->name('order.print');
     Route::get('kot/print/{id}', [KitchenController::class, 'print'])->name('kot.print');
+    Route::post('kot/delete/{id}', [KitchenController::class, 'destroy'])->name('kot.delete');
     Route::get('bot/print/{id}', [BarController::class, 'print'])->name('bot.print');
     Route::resource('rooms', RoomController::class)->middleware('can:manage rooms');
     Route::resource('room-types', RoomTypesController::class)->middleware('can:manage rooms');
