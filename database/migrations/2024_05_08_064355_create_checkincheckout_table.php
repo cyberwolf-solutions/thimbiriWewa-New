@@ -26,8 +26,8 @@ return new class extends Migration
             $table->decimal('total_amount', 10, 2);
             $table->decimal('paid_amount', 10, 2);
             $table->decimal('due_amount', 10, 2);
-            $table->decimal('sub_total', 10, 2);
-            $table->decimal('discount', 10, 2);
+            $table->decimal('sub_total', 10, 2)->default(0.00);;
+            $table->decimal('discount', 10, 2)->default(0.00);;
             
             $table->enum('status', ['CheckedIn', 'CheckedOut' , 'CheckedInANDCheckedOut'])->default('CheckedIn');
             $table->decimal('additional_payment', 10, 2)->default(0.00);

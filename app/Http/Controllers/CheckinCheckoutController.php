@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BordingType;
 use App\Models\Room;
 use App\Models\Booking;
 use App\Models\Customer;
+use App\Models\BordingType;
 use Illuminate\Http\Request;
 use App\Models\RoomFacilities;
 use App\Models\checkincheckout;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -76,16 +77,9 @@ class CheckinCheckoutController extends Controller
         // Validate the incoming request data
         $validator = Validator::make($request->all(), [
             'customer_id' => 'required',
-            'booking_room_id' => 'required',
             'booking_id' => 'required',
-            'room_facility' => 'required',
-            'room_no' => 'required',
-            'checkin' => 'required',
-            'checkout' => 'required',
-            'total' => 'required',
-            'payed' => 'required',
-            'due' => 'required',
             'bordingtype' => 'required',
+            'rooms_data' => 'required|json',
         ]);
 
         if ($validator->fails()) {
@@ -101,28 +95,62 @@ class CheckinCheckoutController extends Controller
 
         try {
             // Create a new Checkin record
-            $customer = checkincheckout::create([
-                'booking_id' => $request->booking_id,
-                'customer_id' => $request->customer_id,
-                'room_type' => $request->booking_room_id,
-                'room_facility_type' => $request->room_facility,
-                'room_no' => $request->room_no,
-                'checkin' => $request->checkin,
-                'checkout' => $request->checkout,
-                'total_amount' => $request->total,
-                'paid_amount' => $request->payed,
-                'due_amount' => $request->due,
-                'boardingtype' => $request->bordingtype,
-                'created_by' => Auth::user()->id,
-            ]);
+            // $customer = checkincheckout::create([
+            //     'booking_id' => $request->booking_id,
+            //     'customer_id' => $request->customer_id,
+            //     'room_type' => $request->booking_room_id,
+            //     'room_facility_type' => $request->room_facility,
+            //     'room_no' => $request->room_no,
+            //     'checkin' => $request->checkin,
+            //     'checkout' => $request->checkout,
+            //     'total_amount' => $request->total,
+            //     'paid_amount' => $request->payed,
+            //     'due_amount' => $request->due,
+            //     'boardingtype' => $request->bordingtype,
+            //     'created_by' => Auth::user()->id,
+            // ]);
+            $roomsData = json_decode($request->rooms_data, true);
 
 
+            Log::info("Room Data" , $roomsData);
+
+            // dd($roomsData);
+
+            foreach ($roomsData as $roomData) {
+                $customer = checkincheckout::create([
+                    'booking_id' => $request->booking_id,
+                    'customer_id' => $request->customer_id,
+                    'boardingtype' => $request->bordingtype,
+                    'created_by' => Auth::user()->id,
+                    'room_type' => $roomData['roomId'],
+                    'room_no' => $roomData['roomNo'],
+                    'room_facility_type' => $roomData['facility'],
+                    'checkin' => $roomData['checkin'],
+                    'checkout' => $roomData['checkout'],
+                    // 'price' => $roomData['price'],
+                    // 'boarding_price' => $roomData['boardingPrice'],
+                    'total_amount' => $roomData['totalCharge'],
+                    'paid_amount' => $roomData['paidAmount'],
+                    'due_amount' => $roomData['dueAmount'],
+                    'sub_total'=>0,
+                    'discount'=>0
+                ]);
+            }
+
+
+            $booking =Booking::find($request->booking_id);
+            $booking->status= 'Complete';
+            $booking->save();
 
             return json_encode(['success' => true, 'message' => 'Customer Checked In', 'url' => route('checkin.index')]);
         } catch (\Throwable $th) {
+            Log::error('Error in CheckinCheckoutController store method: ' . $th->getMessage());
             return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th]);
         }
+        
     }
+
+
 
 
     public function edit(string $id)

@@ -51,14 +51,18 @@
                         <p>{{ $data->room_no }}</p>
                     </div>
 
-                    <div class="col">
+                    {{-- <div class="col">
                         <h6>Room</h6>
                         @php
 
                             $roomName = App\Models\Room::where('room_no', $data->room_no)->value('name');
                         @endphp
                         <p>{{ $roomName }}  - {{ $data->roomfacility->name }}</p>
-                    </div>
+                    </div> --}}
+                    @php
+
+                        $roomName = App\Models\Room::where('room_no', $data->room_no)->value('name');
+                    @endphp
                 @endif
 
             </div>
@@ -77,18 +81,18 @@
                             {{-- <th>Due ammmount</th> --}}
                         </thead>
                         <tbody>
-                                <tr>
-                                    <td>{{ $data->id}}</td>
-                                    <td>{{$roomName  }}</td>
-                                    <td>LKR.{{$data->total_amount }}.00 </td>
-                                    <td>LKR.{{$data->paid_amount }}.00 </td>
-                                    <td>LKR.{{$data->additional_payment }}.00</td>
-                                    <td>{{$data->discount}} %</td>
-                                    {{-- <td>LKR.{{$data->additional_payment + $data->due_amount }}.00</td> --}}
-                                    
-                                </tr>
-                                
-                           
+                            <tr>
+                                <td>{{ $data->id }}</td>
+                                <td>{{ $roomName }}</td>
+                                <td>LKR.{{ $data->total_amount }}.00 </td>
+                                <td>LKR.{{ $data->paid_amount }}.00 </td>
+                                <td>LKR.{{ $data->additional_payment }}.00</td>
+                                <td>{{ $data->discount }} %</td>
+                                {{-- <td>LKR.{{$data->additional_payment + $data->due_amount }}.00</td> --}}
+
+                            </tr>
+
+
                         </tbody>
                         <tfoot>
                             <tr>
@@ -117,7 +121,7 @@
                                     Discount
                                 </td>
                                 <td>
-                                    {{$data->discount}} %
+                                    {{ $data->discount }} %
                                 </td>
                             </tr>
                             <tr>
