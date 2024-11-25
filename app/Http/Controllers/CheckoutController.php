@@ -107,6 +107,8 @@ class CheckoutController extends Controller
             'additional' => 'required',
             'note' => 'required',
             'tot' => 'required',
+            'stot'=>'required',
+            'payment_method'=>'required'
         ]);
 
 
@@ -135,9 +137,13 @@ class CheckoutController extends Controller
                     'note' => $request->input('note'),
                     'full_payment' => $request->input('tot'),
                     'status' => 'CheckedInANDCheckedOut',
+                    'sub_total'=>$request->stot,
+                    'discount'=> $request->has('dis') && !is_null($request->dis) ? $request->dis : 0,
+
                     // 'due_amount'=>0,
                     // 'paid_amount'=>$request->total,
-                    'full_payed_amount'=>$full_payed_amount
+                    'full_payed_amount'=>$full_payed_amount,
+                    'payment_method'=>$request->payment_method,
                 ]);
                 $room->update([
                     'status' => 'Available'

@@ -113,6 +113,17 @@ class PermissionSeeder extends Seeder {
             ['name' => 'Employee report', 'guard_name' => 'web'],
             ['name' => 'Product report', 'guard_name' => 'web'],
             ['name' => 'Booking report', 'guard_name' => 'web'],
+
+
+            ['name' => 'manage bording', 'guard_name' => 'web'],
+            ['name' => 'edit bording', 'guard_name' => 'web'],
+            ['name' => 'delete bording', 'guard_name' => 'web'],
+
+
+            ['name' => 'manage stock', 'guard_name' => 'web'],
+            ['name' => 'manage dailystock', 'guard_name' => 'web'],
+            ['name' => 'create dailystock', 'guard_name' => 'web'],
+
         ];
 
         foreach ($data as $value) {

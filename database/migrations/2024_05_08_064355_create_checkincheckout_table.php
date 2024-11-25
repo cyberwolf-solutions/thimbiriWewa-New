@@ -19,12 +19,15 @@ return new class extends Migration
             $table->string('room_type');
             $table->string('room_facility_type');
             $table->string('room_no');
+            $table->string('bordingtype');
           
             $table->string('checkin');
             $table->string('checkout');
             $table->decimal('total_amount', 10, 2);
             $table->decimal('paid_amount', 10, 2);
             $table->decimal('due_amount', 10, 2);
+            $table->decimal('sub_total', 10, 2);
+            $table->decimal('discount', 10, 2);
             
             $table->enum('status', ['CheckedIn', 'CheckedOut' , 'CheckedInANDCheckedOut'])->default('CheckedIn');
             $table->decimal('additional_payment', 10, 2)->default(0.00);

@@ -20,16 +20,19 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BordingTypeCOntroller;
 use App\Http\Controllers\CheckinCheckoutController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DailyStockController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TableArrangementsController;
 use App\Http\Controllers\EmployeeDesignationsController;
 use App\Http\Controllers\RoomFacilityController;
 use App\Http\Controllers\RoomSizeController;
 use App\Http\Controllers\RoomTypesController;
+use App\Http\Controllers\StockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -167,6 +170,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout/invoice/{checkincheckout_id}', [CheckoutController::class, 'invoice'])->name('checkout.invoice');
     Route::get('/checkout/additional/invoice/{customer_id}/{checkout_date}', [CheckoutController::class, 'additionalInvoice'])->name('checkout.additional.invoice');
 
+
+    //bording type
+    Route::resource('bording-type', BordingTypeCOntroller::class)->middleware('can:manage bording');
+
+
+    Route::resource('stock', StockController::class)->middleware('can:manage stock');
+    Route::resource('daily-stock', DailyStockController::class)->middleware('can:manage dailystock');
 
 
 

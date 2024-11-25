@@ -84,6 +84,9 @@
                                                 'orders',
                                                 'report',
                                                 'settings',
+                                                'bording',
+                                                'stock',
+                                                'dailystock'
                                             ];
                                         @endphp
                                         @foreach ($main as $moduleName)

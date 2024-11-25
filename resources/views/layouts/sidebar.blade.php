@@ -113,6 +113,32 @@
                     </li>
                 @endcanany
 
+
+                @canany(['manage stock', 'manage dailystock'])
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="#stock" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="stock">
+                            <i class="mdi mdi-office-building"></i> <span>Stock</span>
+                        </a>
+                        <div class="collapse menu-dropdown" id="stock">
+                            <ul class="nav nav-sm flex-column">
+                                @can('manage stock')
+                                    <li class="nav-item">
+                                        <a href="{{ route('stock.index') }}" class="nav-link">Stock</a>
+                                    </li>
+                                @endcan
+                                @can('manage dailystock')
+                                    <li class="nav-item">
+                                        <a href="{{ route('daily-stock.index') }}" class="nav-link">Kitchen</a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </div>
+                    </li>
+                @endcan
+
+
+
                 @canany(['manage categories', 'manage units'])
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#constants" data-bs-toggle="collapse" role="button"
@@ -286,6 +312,22 @@
                     </li>
                 @endcan
 
+                @can('manage bording')
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="#bordingtype" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="bordingtype">
+                            <i class="mdi mdi-office-building"></i> <span>Boarding</span>
+                        </a>
+                        <div class="collapse menu-dropdown" id="bordingtype">
+                            <ul class="nav nav-sm flex-column">
+                                <li class="nav-item">
+                                    <a href="{{ route('bording-type.index') }}" class="nav-link">Boarding Type</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endcan
+
 
                 @canany(['manage rooms'])
                     <li class="nav-item">
@@ -332,7 +374,8 @@
                                 @endcan
                                 @can('manage report')
                                     <li class="nav-item">
-                                        <a href="{{ route('employees.ReportsIndex') }}" class="nav-link">Employees Reports</a>
+                                        <a href="{{ route('employees.ReportsIndex') }}" class="nav-link">Employees
+                                            Reports</a>
                                     </li>
                                 @endcan
                                 @can('manage report')
@@ -355,12 +398,13 @@
                                         <a href="{{ route('booking.ReportsIndex') }}" class="nav-link">Booking Reports</a>
                                     </li>
                                 @endcan
+
                                 @can('manage report')
                                 <li class="nav-item">
                                     <a href="{{ route('order.ReportsIndex') }}" class="nav-link">Order Reports</a>
                                 </li>
                             @endcan
-                                
+ 
                             </ul>
                         </div>
                     </li>

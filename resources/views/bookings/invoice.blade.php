@@ -73,6 +73,7 @@
                             <th>Room Payment</th>
                             <th>Payment when Check In</th>
                             <th>Additional payment</th>
+                            <th>Discount</th>
                             {{-- <th>Due ammmount</th> --}}
                         </thead>
                         <tbody>
@@ -82,6 +83,7 @@
                                     <td>LKR.{{$data->total_amount }}.00 </td>
                                     <td>LKR.{{$data->paid_amount }}.00 </td>
                                     <td>LKR.{{$data->additional_payment }}.00</td>
+                                    <td>{{$data->discount}} %</td>
                                     {{-- <td>LKR.{{$data->additional_payment + $data->due_amount }}.00</td> --}}
                                     
                                 </tr>
@@ -106,7 +108,7 @@
                                 </td>
                                 <td>
                                     {{ $settings->currency }}
-                                    {{ $data->additional_payment + $data->due_amount }}
+                                    {{ $data->additional_payment + ($data->total_amount - $data->paid_amount) }}
                                 </td>
                             </tr>
                             <tr>
@@ -115,8 +117,7 @@
                                     Discount
                                 </td>
                                 <td>
-                                    {{ $settings->currency }}
-                                    {{ number_format($data->payment ? $data->payment->discount : 0, 2) }}
+                                    {{$data->discount}} %
                                 </td>
                             </tr>
                             <tr>
@@ -136,7 +137,7 @@
                                 </td>
                                 <td>
                                     <h5 class="fw-bold">{{ $settings->currency }}
-                                        {{ $data->additional_payment + $data->total_amount }} .00</h5>
+                                        {{ $data->sub_total }} .00</h5>
                                 </td>
                             </tr>
                         </tfoot>
