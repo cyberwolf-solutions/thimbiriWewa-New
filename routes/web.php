@@ -74,6 +74,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase', [ReportsController::class, 'purchase'])->name('purchase.ReportsIndex')->middleware('can:manage report');
     Route::get('/product', [ReportsController::class, 'product'])->name('product.ReportsIndex')->middleware('can:manage report');
     Route::get('/booking', [ReportsController::class, 'booking'])->name('booking.ReportsIndex')->middleware('can:manage report');
+    Route::get('/order', [ReportsController::class, 'order'])->name('order.ReportsIndex')->middleware('can:manage report');
+    Route::get('/search-by-type', [ReportsController::class, 'searchByType'])->name('search.by.type');
 
 
 
@@ -151,7 +153,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('room-size', RoomSizeController::class)->middleware('can:manage rooms');
     Route::resource('room-facility', RoomFacilityController::class)->middleware('can:manage rooms');
     Route::resource('checkin', CheckinCheckoutController::class)->middleware('can:manage bookings');
-    
+
 
     // routes/web.php
     Route::get('/get-booking-rooms/{customerId}', [CheckinCheckoutController::class, 'getBookingRooms'])->name('get.booking.rooms');
@@ -161,10 +163,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-booking-payment-details/{bookingId}', [CheckoutController::class, 'getBookingPaymentDetails']);
 
     Route::get('/get-customer-orders/{customerId}', [CheckoutController::class, 'getCustomerOrders']);
-    Route::get('/get-checkincheckout-id',  [CheckoutController::class, 'getCheckinCheckoutId'] )->name('get.checkincheckout.id');
-    
-    
-    
+    Route::get('/get-checkincheckout-id',  [CheckoutController::class, 'getCheckinCheckoutId'])->name('get.checkincheckout.id');
+
+
+
     Route::get('/checkout/invoice/{checkincheckout_id}', [CheckoutController::class, 'invoice'])->name('checkout.invoice');
     Route::get('/checkout/additional/invoice/{customer_id}/{checkout_date}', [CheckoutController::class, 'additionalInvoice'])->name('checkout.additional.invoice');
 
@@ -177,7 +179,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('daily-stock', DailyStockController::class)->middleware('can:manage dailystock');
 
 
-    
 
 
 
@@ -186,7 +187,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    
+
 
 
 
