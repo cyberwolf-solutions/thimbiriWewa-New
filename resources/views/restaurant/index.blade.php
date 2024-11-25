@@ -215,11 +215,11 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="row">
-                                        <div class="col-4 p-2 border rounded-3 bg-blue-gray-100 small">
+                                        <div class="col-3 p-2 border rounded-3 bg-blue-gray-100 small">
                                             <span>Subtotal</span><br>
                                             <span id="sub" value="0">LKR 0.00</span>
                                         </div>
-                                        <div class="col-4 p-2 border rounded-3 bg-blue-gray-100 small">
+                                        <div class="col-3 p-2 border rounded-3 bg-blue-gray-100 small">
                                             <span>Discount (<span id="discount_method_html">0%</span>)</span><br>
                                             <span><span id="discount_html">LKR 0.00</span> <a href="javascript:void(0)"
                                                     class="float-end" id="discount-edit" data-ajax-popup="true"
@@ -228,12 +228,21 @@
                                                     (Edit)
                                                 </a></span>
                                         </div>
-                                        <div class="col-4 p-2 border rounded-3 bg-blue-gray-100 small">
+                                        <div class="col-3 p-2 border rounded-3 bg-blue-gray-100 small">
                                             <span>VAT (<span id="vat_method_html">0%</span>)</span><br>
                                             <span><span id="vat_html">LKR 0.00</span> <a href="javascript:void(0)"
                                                     class="float-end" id="vat-edit" data-ajax-popup="true"
                                                     data-title="VAT Edit" data-size="lg"
                                                     data-url="{{ route('restaurant.vat') }}">
+                                                    (Edit)
+                                                </a></span>
+                                        </div>
+                                        <div class="col-3 p-2 border rounded-3 bg-blue-gray-100 small">
+                                            <span>Service (<span id="service_method_html">0%</span>)</span><br>
+                                            <span><span id="service_html">LKR 0.00</span> <a href="javascript:void(0)"
+                                                    class="float-end" id="service-edit" data-ajax-popup="true"
+                                                    data-title="service Edit" data-size="lg"
+                                                    data-url="{{ route('restaurant.service') }}">
                                                     (Edit)
                                                 </a></span>
                                         </div>
@@ -303,6 +312,10 @@
             var vat = 0;
             var vat_val = 0;
             var vat_method;
+
+            var service = 0;
+            var service_val = 0;
+            var service_method;
 
             var customer = 0;
             var table = 0;
@@ -536,6 +549,17 @@
                     );
                 }
 
+                  //service
+                  if (service_method == 'precentage') {
+                    $('#service_method_html').html(`${service_val}%`);
+                    service = sub * service_val / 100;
+                } else {
+                    service = parseFloat(service_val);
+                    $('#service_method_html').html(
+                        `LKR ${service_val}`
+                    );
+                }
+
                 // // Update the data-url attribute with the vat variable and the method
                 var binding = "?vat=" + vat_val + "&vat_method=" + vat_method;
                 $('#vat-edit').attr('data-binding', binding); // Update the HTML attribute
@@ -544,8 +568,21 @@
                     `{{ $settings->currency }} ${vat.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`
                 );
 
+                // if (sub > 0) {
+                //     total = sub - discount + vat;
+                // } else {
+                //     total = 0;
+                // }
+
+                var binding = "?service=" + service_val + "&service_method=" + service_method;
+                $('#service-edit').attr('data-binding', binding); // Update the HTML attribute
+
+                $('#service_html').html(
+                    `{{ $settings->currency }} ${service.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}`
+                );
+
                 if (sub > 0) {
-                    total = sub - discount + vat;
+                    total = sub - discount + vat+service;
                 } else {
                     total = 0;
                 }
@@ -631,6 +668,7 @@
 
         <script>
             function checkout() {
+             
                 beep();
                 $('#loader').removeClass('d-none');
 
@@ -648,6 +686,7 @@
                 formData.append('sub', sub);
                 formData.append('discount', discount);
                 formData.append('vat', vat);
+                formData.append('service', service);
                 formData.append('total', total);
                 formData.append('kitchen_note', kitchen_note);
                 formData.append('bar_note', bar_note);

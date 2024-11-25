@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->text('note')->nullable();
             $table->enum('type', ['Dining', 'TakeAway', 'RoomDelivery'])->default('Dining');
             $table->string('progress')->nullable();
-            $table->enum('status', ['Pending', 'InProgress', 'Complete'])->default('Pending');
+            $table->enum('status', ['Pending', 'InProgress', 'Complete','Cancel'])->default('Pending');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();

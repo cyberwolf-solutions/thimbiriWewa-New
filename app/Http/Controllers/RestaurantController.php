@@ -120,6 +120,11 @@ class RestaurantController extends Controller {
         $vat_method = $request->vat_method;
         return view('restaurant.vat-modal', compact('vat', 'vat_method'));
     }
+    public function service(Request $request) {
+        $service = $request->service;
+        $service_method = $request->service_method;
+        return view('restaurant.service-modal', compact('service', 'service_method'));
+    }
     public function modifiers(Request $request) {
         $id = $request->id;
         $category = Meal::find($id)->category_id;
@@ -132,6 +137,7 @@ class RestaurantController extends Controller {
             'customer' => 'required',
             'room' => 'required',
             'table' => 'required',
+            'service' => 'required',
             'sub' => 'required',
             'discount' => 'required',
             'vat' => 'required',
@@ -232,6 +238,7 @@ class RestaurantController extends Controller {
                 'date' => date('d-m-Y'),
                 'sub_total' => $request->sub,
                 'vat' => $request->vat,
+                'service' => $request->service,
                 'discount' => $request->discount,
                 'total' => $request->total,
                 // 'payment_type' => '',

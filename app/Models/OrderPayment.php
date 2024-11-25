@@ -15,6 +15,7 @@ class OrderPayment extends Model {
         'date',
         'sub_total',
         'vat',
+        'service',
         'discount',
         'total',
         'payment_type',

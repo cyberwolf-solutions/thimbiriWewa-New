@@ -399,7 +399,12 @@
                                     </li>
                                 @endcan
 
-
+                                @can('manage report')
+                                <li class="nav-item">
+                                    <a href="{{ route('order.ReportsIndex') }}" class="nav-link">Order Reports</a>
+                                </li>
+                            @endcan
+ 
                             </ul>
                         </div>
                     </li>

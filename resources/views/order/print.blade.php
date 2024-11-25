@@ -127,6 +127,16 @@
                             <tr>
                                 <td colspan="3"></td>
                                 <td>
+                                    Service charge
+                                </td>
+                                <td>
+                                    {{ $settings->currency }}
+                                    {{ number_format($data->payment ? $data->payment->service : 0, 2) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"></td>
+                                <td>
                                     <h5 class="fw-bold">Total</h5>
                                 </td>
                                 <td>
