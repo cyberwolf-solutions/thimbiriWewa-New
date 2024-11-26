@@ -23,6 +23,7 @@ return new class extends Migration
           
             $table->string('checkin');
             $table->string('checkout');
+            // $table->string('payment_method');
             $table->decimal('total_amount', 10, 2);
             $table->decimal('paid_amount', 10, 2);
             $table->decimal('due_amount', 10, 2);
