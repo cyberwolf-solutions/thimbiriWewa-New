@@ -57,6 +57,11 @@ class OrderController extends Controller {
         return view('order.print', compact('data'));
     }
 
+    public function printk(string $id) {
+        $data = Order::find($id);
+        return view('order.printk', compact('data'));
+    }
+
     /**
      * Show the form for editing the specified resource.
      */

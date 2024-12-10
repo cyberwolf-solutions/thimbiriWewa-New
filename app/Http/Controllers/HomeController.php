@@ -49,7 +49,11 @@ class HomeController extends Controller {
 
         $Products = Product::all();
 
+        $orders1 = Order::orderBy('created_at', 'desc')->paginate(10);
+;
 
-        return view('home', compact('totalOrders', 'totalBookings', 'todayOrders', 'todayBookings' ,'customers' , 'employees' ,'suppliers' , 'Products'));
+
+
+        return view('home', compact('totalOrders', 'totalBookings', 'todayOrders', 'todayBookings' ,'customers' , 'employees' ,'suppliers' , 'Products','orders1'));
     }
 }

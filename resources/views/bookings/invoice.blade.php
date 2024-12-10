@@ -1,7 +1,7 @@
 @extends('layouts.master-without-nav')
 
 @section('title')
-    Print Order
+    Invoice
 @endsection
 
 @section('content')
@@ -9,149 +9,123 @@
         body {
             background-color: #FFF !important;
         }
+        .invoice-header img {
+            width: 150px;
+        }
+        .invoice-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .table tfoot td {
+            font-weight: bold;
+        }
+        .border-top {
+            border-top: 2px solid #dee2e6;
+        }
+        .fw-bold {
+            font-weight: bold;
+        }
     </style>
+
     <div class="container-fluid">
         <div class="row">
-            <div class="row my-2 justify-content-center text-center">
-                <img src="{{ asset('storage/' . $settings->logo_dark) }}" class="img-fluid w-25" alt="">
-                <span class="fs-5">Thimbiri Wewa Resort</span>
+            <div class="text-center my-4">
+                <img src="{{ asset('storage/' . $settings->logo_dark) }}" class="invoice-header img-fluid" alt="Logo">
+                <div class="invoice-title">Thimbiri Wewa Resort</div>
+                <p>{{ $settings->address }}</p>
             </div>
-            <div class="row justify-content-between mt-5">
-                <div class="col">
-                    <h6>Checkout No</h6>
-                    <span>#{{ $settings->invoice($data->id) }}</span>
-                </div>
-                <div class="col">
-                    <h6>Checkout Date</h6>
-                    <span>{{ \Carbon\Carbon::parse($data->checkin)->format($settings->date_format) }}</span>
-                </div>
 
-                <div class="col">
-                    <h6>Checkout Date</h6>
-                    <span>{{ \Carbon\Carbon::parse($data->checkout)->format($settings->date_format) }}</span>
-                </div>
-
-            </div>
-            {{-- <hr> --}}
-            <div class="row mt-4">
-                <div class="col">
-                    <h6>Customer</h6>
-                    @if ($data->customer_id == 0)
-                        <p>Walking Customer</p>
-                    @else
-                        <p>{{ $data->customer->name }},</p>
-                        <p>{{ $data->customer->contact }},</p>
-                        <p>{{ $data->customer->email }},</p>
-                        <p>{{ $data->customer->address }}.</p>
-                    @endif
-                </div>
-                @if ($data->room_no != 0)
-                    <div class="col">
-                        <h6>Room No</h6>
-                        <p>{{ $data->room_no }}</p>
+            @foreach ($data as $row)
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <span class="fw-bold">Invoice #:</span> {{ $settings->invoice($row->id) }}
                     </div>
-
-                    {{-- <div class="col">
-                        <h6>Room</h6>
-                        @php
-
-                            $roomName = App\Models\Room::where('room_no', $data->room_no)->value('name');
-                        @endphp
-                        <p>{{ $roomName }}  - {{ $data->roomfacility->name }}</p>
-                    </div> --}}
-                    @php
-
-                        $roomName = App\Models\Room::where('room_no', $data->room_no)->value('name');
-                    @endphp
-                @endif
-
-            </div>
-            <hr>
-            <div class="row">
-                <h6>Payment</h6>
-                <div class="col-12">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <th>#</th>
-                            <th>Room Name</th>
-                            <th>Room Payment</th>
-                            <th>Payment when Check In</th>
-                            <th>Additional payment</th>
-                            <th>Discount</th>
-                            {{-- <th>Due ammmount</th> --}}
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ $data->id }}</td>
-                                <td>{{ $roomName }}</td>
-                                <td>LKR.{{ $data->total_amount }}.00 </td>
-                                <td>LKR.{{ $data->paid_amount }}.00 </td>
-                                <td>LKR.{{ $data->additional_payment }}.00</td>
-                                <td>{{ $data->discount }} %</td>
-                                {{-- <td>LKR.{{$data->additional_payment + $data->due_amount }}.00</td> --}}
-
-                            </tr>
-
-
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td>
-                                    Sub Total
-                                </td>
-                                <td>
-                                    {{ $settings->currency }}
-                                    {{ $data->additional_payment + $data->total_amount }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td>
-                                    Due Amount
-                                </td>
-                                <td>
-                                    {{ $settings->currency }}
-                                    {{ $data->additional_payment + ($data->total_amount - $data->paid_amount) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td>
-                                    Discount
-                                </td>
-                                <td>
-                                    {{ $data->discount }} %
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td>
-                                    VAT
-                                </td>
-                                <td>
-                                    {{ $settings->currency }}
-                                    {{ number_format($data->payment ? $data->payment->vat : 0, 2) }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3"></td>
-                                <td>
-                                    <h5 class="fw-bold">Full Payment</h5>
-                                </td>
-                                <td>
-                                    <h5 class="fw-bold">{{ $settings->currency }}
-                                        {{ $data->sub_total }} .00</h5>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    <div>
+                        <span class="fw-bold">Checkout Date:</span> 
+                        {{ \Carbon\Carbon::parse($data1->checkout)->format($settings->date_format) }}
+                    </div>
                 </div>
+            @endforeach
+
+            <div class="mb-4">
+                <h6 class="fw-bold">Customer Details</h6>
+                <p>
+                    @if ($data1->customer_id == 0)
+                        Walking Customer
+                    @else
+                        {{ $data1->customer->name }}<br>
+                        {{ $data1->customer->contact }}<br>
+                        {{ $data1->customer->email }}<br>
+                        {{ $data1->customer->address }}
+                    @endif
+                </p>
             </div>
+
+            @if ($data1->room_no != 0)
+                <div class="mb-4">
+                    <h6 class="fw-bold">Room Details</h6>
+                    <p>Room No: {{ $data1->room_no }}</p>
+                    {{-- <p>Room Name: {{ $roomName }}</p> --}}
+                </div>
+            @endif
+
+            <div class="border-top my-4"></div>
+
+            <h6 class="fw-bold">Payment Details</h6>
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Room Name</th>
+                        <th>Room Payment (LKR)</th>
+                        <th>Paid at Check-In (LKR)</th>
+                        <th>Additional Payment (LKR)</th>
+                        <th>Discount (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($data as $data)
+                        <tr>
+                            <td>{{ $data->id }}</td>
+                            {{-- <td>{{ $roomName }}</td> --}}
+                            <td>{{ number_format($data->total_amount, 2) }}</td>
+                            <td>{{ number_format($data->paid_amount, 2) }}</td>
+                            <td>{{ number_format($data->additional_payment, 2) }}</td>
+                            <td>{{ $data->discount }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4">Sub Total</td>
+                        <td colspan="2">{{ $settings->currency }} {{ number_format($data->additional_payment + $data->total_amount, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Due Amount</td>
+                        <td colspan="2">{{ $settings->currency }} {{ number_format($data->additional_payment + ($data->total_amount - $data->paid_amount), 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Discount</td>
+                        <td colspan="2">{{ $data->discount }}%</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">VAT</td>
+                        <td colspan="2">{{ $settings->currency }} {{ number_format($data->payment ? $data->payment->vat : 0, 2) }}</td>
+                    </tr>
+                    <tr class="border-top">
+                        <td colspan="4"><h5 class="fw-bold">Total Payment</h5></td>
+                        <td colspan="2"><h5 class="fw-bold">{{ $settings->currency }} {{ number_format($data->sub_total, 2) }}</h5></td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 @endsection
-
 
 @section('script')
     <script>

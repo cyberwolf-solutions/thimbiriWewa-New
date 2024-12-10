@@ -2,34 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\notifyBot;
-use App\Events\notifyKot;
-use App\Models\BookingsRooms;
+use App\Models\Meal;
+use App\Models\Room;
+use App\Models\Order;
+use App\Models\Table;
 use App\Models\Category;
 use App\Models\Customer;
-use App\Models\Meal;
 use App\Models\Modifier;
-use App\Models\ModifiersCategories;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\OrderItemModifier;
-use App\Models\OrderNote;
-use App\Models\OrderPayment;
-use App\Models\Restaurant;
-use App\Models\Room;
-use App\Models\Table;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use PhpParser\Modifiers;
+use App\Events\notifyBot;
+use App\Events\notifyKot;
+use App\Models\OrderItem;
+use App\Models\OrderNote;
+use App\Models\Restaurant;
+use App\Models\OrderPayment;
+use Illuminate\Http\Request;
+use App\Models\BookingsRooms;
+use App\Models\OrderItemModifier;
+use App\Models\ModifiersCategories;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 
-class RestaurantController extends Controller {
+class RestaurantController extends Controller
+{
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index()
+    {
         $title = 'POS';
-
+        if (!Gate::allows('manage pos') && !Gate::allows('manage waiter')) {
+            abort(403); // Unauthorized if neither permission is granted
+        }
         $breadcrumbs = [
             // ['label' => 'First Level', 'url' => '', 'active' => false],
             ['label' => $title, 'url' => '', 'active' => true],
@@ -44,95 +49,140 @@ class RestaurantController extends Controller {
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {
+    public function create()
+    {
         //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {
+    public function show(string $id)
+    {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id) {
+    public function edit(string $id)
+    {
         //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id) {
+    public function update(Request $request, string $id)
+    {
         //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id) {
+    public function destroy(string $id)
+    {
         //
     }
 
-    public function note() {
+    public function note()
+    {
         return view('restaurant.notes');
     }
-    public function process() {
+    public function process()
+    {
         $inProgress = Order::where('status', 'Pending')->get();
         $ready = Order::where('status', 'InProgress')->get();
         return view('restaurant.in-process', compact('inProgress', 'ready'));
     }
-    public function tables(Request $request) {
+    public function tables(Request $request)
+    {
         $table = $request->table;
         $tables = Table::all()->where('availability', 'Available');
         return view('restaurant.tables-modal', compact('tables', 'table'));
     }
-    public function rooms(Request $request) {
+    // public function rooms(Request $request)
+    // {
+    //     $room = $request->room;
+    //     $rooms = BookingsRooms::all();
+    //     return view('restaurant.rooms-modal', compact('rooms', 'room'));
+    // }
+
+    //     public function rooms(Request $request)
+    // {
+    //     $room = $request->room;
+
+    //     // Retrieve only rooms with a pending status
+    //     $rooms = BookingsRooms::whereHas('bookings', function ($query) {
+    //         $query->where('status', 'Pending');
+    //     })->get();
+
+    //     return view('restaurant.rooms-modal', compact('rooms', 'room'));
+    // }
+
+    public function rooms(Request $request)
+    {
         $room = $request->room;
-        $rooms = BookingsRooms::all();
+    
+        // Retrieve rooms with pending bookings and load customer info
+        $rooms = BookingsRooms::whereHas('bookings', function ($query) {
+            $query->whereIn('status', ['Pending', 'Ongoing']);
+        })
+        ->with(['bookings.customerss']) // Use the correct relationship names
+        ->get();
+        
+    
         return view('restaurant.rooms-modal', compact('rooms', 'room'));
     }
-    public function customer(Request $request) {
+    
+    public function customer(Request $request)
+    {
         $customer = $request->customer;
         $customers = Customer::all();
-
         return view('restaurant.customer-modal', compact('customers', 'customer'));
     }
-    public function customerAdd() {
+
+    public function customerAdd()
+    {
         return view('restaurant.customer-add-modal');
     }
-    public function discount(Request $request) {
+    public function discount(Request $request)
+    {
         $discount = $request->discount;
         $discount_method = $request->discount_method;
         return view('restaurant.discount-modal', compact('discount', 'discount_method'));
     }
-    public function vat(Request $request) {
+    public function vat(Request $request)
+    {
         $vat = $request->vat;
         $vat_method = $request->vat_method;
         return view('restaurant.vat-modal', compact('vat', 'vat_method'));
     }
-    public function service(Request $request) {
+    public function service(Request $request)
+    {
         $service = $request->service;
         $service_method = $request->service_method;
         return view('restaurant.service-modal', compact('service', 'service_method'));
     }
-    public function modifiers(Request $request) {
+    public function modifiers(Request $request)
+    {
         $id = $request->id;
         $category = Meal::find($id)->category_id;
         $modifiers = ModifiersCategories::where('category_id', $category)->get();
         return view('restaurant.modifiers-modal', compact('modifiers', 'id'));
     }
 
-    public function checkout(Request $request) {
+    public function checkout(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'customer' => 'required',
             'room' => 'required',
@@ -247,7 +297,7 @@ class RestaurantController extends Controller {
 
             if ($request->type == 'Dining') {
                 $data['payment_status'] = 'Paid';
-            }else if ($request->type == 'TakeAway') {
+            } else if ($request->type == 'TakeAway') {
                 $data['payment_status'] = 'Paid';
             }
 
@@ -266,14 +316,28 @@ class RestaurantController extends Controller {
             if ($isBOT) {
                 event(new notifyBot('New BOT'));
             }
-
-            return response()->json(['success' => true, 'message' => 'Order Placed!', 'url' => route('order.print', [$order->id])]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Order Placed!',
+                'urls' => [
+                    'print' => route('order.print', [$order->id]),
+                    'printk' => route('order.printk', [$order->id])
+                ]
+            ]);
         } catch (\Throwable $th) {
-            //throw $th;
-            return response()->json(['success' => false, 'message' => 'Something went wrong!' . $th]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong! ' . $th->getMessage()
+            ]);
         }
+        //     return response()->json(['success' => true, 'message' => 'Order Placed!', 'url' => route('order.print', [$order->id])]);
+        // } catch (\Throwable $th) {
+        //     //throw $th;
+        //     return response()->json(['success' => false, 'message' => 'Something went wrong!' . $th]);
+        // }
     }
-    public function completeMeal(Request $request) {
+    public function completeMeal(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
         ]);
@@ -324,7 +388,8 @@ class RestaurantController extends Controller {
             return response()->json(['success' => false, 'message' => 'Something went wrong!']);
         }
     }
-    public function completeOrder(Request $request) {
+    public function completeOrder(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
         ]);

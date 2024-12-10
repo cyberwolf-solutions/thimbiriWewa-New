@@ -19,4 +19,11 @@ class BookingsRooms extends Model {
     public function room() {
         return $this->hasOne(Room::class, 'id', 'room_id');
     }
+
+    public function bookings()
+    {
+        return $this->belongsTo(Booking::class, 'booking_id');
+    }
+    
+
 }
