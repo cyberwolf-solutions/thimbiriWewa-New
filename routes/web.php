@@ -172,7 +172,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/checkout/invoice/{checkincheckout_id}', [CheckoutController::class, 'invoice'])->name('checkout.invoice');
     Route::get('/checkout/invoicee/{checkincheckout_id}', [CheckoutController::class, 'invoicee'])->name('checkout.invoicee');
-    Route::get('/checkout/additional/invoice/{customer_id}/{checkout_date}', [CheckoutController::class, 'additionalInvoice'])->name('checkout.additional.invoice');
+    Route::get('/checkout/additional/invoice/{customer_id}/{checkout_date}/{room_no}', [CheckoutController::class, 'additionalInvoice'])->name('checkout.additional.invoice');
 
 
     //bording type

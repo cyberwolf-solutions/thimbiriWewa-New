@@ -368,14 +368,23 @@ class CheckoutController extends Controller
         // Pass the data to the view
         return view('bookings.invoice2', compact('data'));
     }
-    public function additionalInvoice($customerId, $checkoutDate)
+    public function additionalInvoice($customerId, $checkoutDate , $room_no)
     {
 
+        $room_id = Room::where('room_no', $room_no)->value('id'); 
+        
         $cid = $customerId;
+        // dd($room_id);
 
+        // $checkinCheckout = CheckinCheckout::where('customer_id', $customerId)
+        //     ->whereDate('checkout', $checkoutDate)
+        //     ->first();
         $checkinCheckout = CheckinCheckout::where('customer_id', $customerId)
-            ->whereDate('checkout', $checkoutDate)
-            ->first();
+        ->whereDate('checkout', $checkoutDate)
+        ->where('room_no', $room_no)
+        ->first();
+
+        
 
         $updatedAt = $checkinCheckout ? $checkinCheckout->updated_at->format('Y-m-d') : null;
 
@@ -387,7 +396,10 @@ class CheckoutController extends Controller
 
             $orders = Order::where('customer_id', $customerId)
                 ->where('type', 'RoomDelivery')
+                ->where('room_id', $room_id)
                 ->get();
+
+                // dd($room_id , $room_no);
 
             $orderIds = $orders->pluck('id');
 
