@@ -26,10 +26,10 @@ class checkincheckout extends Model
         'full_payment',
         'note',
         'full_payed_amount',
-        'boardingtype',
+        'bordingtype',
         'sub_total',
         'discount',
-       
+
     ];
 
     public function booking()
