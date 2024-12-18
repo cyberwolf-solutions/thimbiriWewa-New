@@ -64,6 +64,8 @@ class PermissionSeeder extends Seeder {
             ['name' => 'manage pos', 'guard_name' => 'web'],
             ['name' => 'manage kitchen', 'guard_name' => 'web'],
             ['name' => 'delete kitchen', 'guard_name' => 'web'],
+            ['name' => 'view kitchen', 'guard_name' => 'web'],
+            ['name' => 'widget kitchen', 'guard_name' => 'web'],
             ['name' => 'manage bar', 'guard_name' => 'web'],
             ['name' => 'manage tables', 'guard_name' => 'web'],
             ['name' => 'create tables', 'guard_name' => 'web'],
@@ -124,6 +126,15 @@ class PermissionSeeder extends Seeder {
             ['name' => 'manage stock', 'guard_name' => 'web'],
             ['name' => 'manage dailystock', 'guard_name' => 'web'],
             ['name' => 'create dailystock', 'guard_name' => 'web'],
+
+
+            ['name' => 'booking widget', 'guard_name' => 'web'],
+            ['name' => 'guest widget', 'guard_name' => 'web'],
+            ['name' => 'stock widget', 'guard_name' => 'web'],
+            ['name' => 'orders widget', 'guard_name' => 'web'],
+            ['name' => 'dailybooking widget', 'guard_name' => 'web'],
+
+            ['name' => 'manage waiter', 'guard_name' => 'web'],
 
         ];
 

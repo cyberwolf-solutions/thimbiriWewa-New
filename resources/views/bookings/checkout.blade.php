@@ -77,7 +77,7 @@
                                             </a>
                                         @endcan --}}
                                         @can('manage bookings')
-                                            <a data-url="{{ route('checkout.invoice', [$item->id]) }}"
+                                            <a data-url="{{ route('checkout.invoicee', [$item->id]) }}"
                                                 data-id="{{ $item->id }}"
                                                 class="btn btn-primary btn-sm small btn-icon text-white show-modal">
                                                 <i class="mdi mdi-room-service" data-bs-toggle="tooltip" title="Print Invoice"></i>
@@ -85,7 +85,7 @@
                                         @endcan
 
                                         @can('manage bookings')
-                                        <a data-url="{{ route('checkout.additional.invoice', ['customer_id' => $item->customer_id, 'checkout_date' => $item->checkout]) }}"
+                                        <a data-url="{{ route('checkout.additional.invoice', ['customer_id' => $item->customer_id, 'checkout_date' => $item->checkout , 'room_no' => $item->room_no,]) }}"
                                                 data-id="{{ $item->id }}"
                                                 class="btn btn-primary btn-sm small btn-icon text-white show-modal">
                                                 <i class="mdi mdi-room-service" data-bs-toggle="tooltip" title="Print Additional Payments invoice"></i>

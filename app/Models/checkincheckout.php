@@ -29,7 +29,7 @@ class checkincheckout extends Model
         'bordingtype',
         'sub_total',
         'discount',
-        // 'payment_method'
+
     ];
 
     public function booking()

@@ -404,14 +404,14 @@
                 });
 
 
-                $(document).on('change', '#customer', function() {
-                    $('#customer-btn #name').text($(this).find(':selected').data('name'));
-                    customer = $(this).find(':selected').val();
+                // $(document).on('change', '#customer', function() {
+                //     $('#customer-btn #name').text($(this).find(':selected').data('name'));
+                //     customer = $(this).find(':selected').val();
 
-                    // Update the data-url attribute with the customer variable
-                    var binding = "?customer=" + customer;
-                    $('#customer-btn').attr('data-binding', binding); // Update the HTML attribute
-                });
+                //     // Update the data-url attribute with the customer variable
+                //     var binding = "?customer=" + customer;
+                //     $('#customer-btn').attr('data-binding', binding); // Update the HTML attribute
+                // });
 
                 $(document).on('change', '.table', function() {
                     $('#table-btn #name').text($(this).data('name'));
@@ -420,13 +420,31 @@
                     var binding = "?table=" + table;
                     $('#table-btn').attr('data-binding', binding); // Update the HTML attribute
                 });
+                // $(document).on('change', '.room', function() {
+
+                //     $('#room-btn #name').text($(this).data('name'));
+                //     room = $(this).val();
+                //     // Update the data-url attribute with the room variable
+                //     var binding = "?room=" + room;
+                //     $('#room-btn').attr('data-binding', binding); // Update the HTML attribute
+
+                //     var customer = $(this).data('customer-id');
+                //     var binding = "?customer=" + customer;
+                //     alert(customer);
+                // });
+
                 $(document).on('change', '.room', function() {
-                    $('#room-btn #name').text($(this).data('name'));
-                    room = $(this).val();
-                    // Update the data-url attribute with the room variable
-                    var binding = "?room=" + room;
-                    $('#room-btn').attr('data-binding', binding); // Update the HTML attribute
+                    room = $(this).val(); // Update the room variable with the selected value
+                    customer = $(this).data(
+                    'customer-id'); // Update the customer variable with the selected customer ID
+
+                    // Optional: Debug to verify values
+                    console.log('Room ID:', room);
+                    console.log('Customer ID:', customer);
                 });
+
+
+
 
             });
         </script>
@@ -549,8 +567,8 @@
                     );
                 }
 
-                  //service
-                  if (service_method == 'precentage') {
+                //service
+                if (service_method == 'precentage') {
                     $('#service_method_html').html(`${service_val}%`);
                     service = sub * service_val / 100;
                 } else {
@@ -582,7 +600,7 @@
                 );
 
                 if (sub > 0) {
-                    total = sub - discount + vat+service;
+                    total = sub - discount + vat + service;
                 } else {
                     total = 0;
                 }
@@ -668,7 +686,7 @@
 
         <script>
             function checkout() {
-             
+
                 beep();
                 $('#loader').removeClass('d-none');
 
@@ -708,27 +726,33 @@
                     data: formData,
                     success: function(response) {
                         $('#loader').addClass('d-none');
+
                         if (response.success) {
-                            display_success(response.message); // replace with your success message
+                            display_success(response.message); // Display success message
+
+                            if (response.urls) {
+                                // Open both print and printk URLs in new tabs with a slight delay
+                                window.open(response.urls.print, '_blank');
+                                setTimeout(function() {
+                                    window.open(response.urls.printk, '_blank');
+                                }, 200); // 200ms delay to avoid popup blocking
+                            }
+
                             setTimeout(function() {
-                                window.location.href = response.url
+                                window.location.reload(); // Optionally reload the page after some time
                             }, 1500);
                         } else {
-                            display_error(response.message); // replace with your error message
-                        }
-                        if (response.url) {
-                            window.open(response.url, '_blank');
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 1500);
+                            display_error(response.message); // Display error message
                         }
                     },
+
                     error: function(xhr) {
                         $('#loader').addClass('d-none');
                         var errorMessage = xhr.status + ': ' + xhr.statusText;
-                        display_error(errorMessage);
+                        display_error(errorMessage); // Display error on failure
                     }
                 });
+
             }
         </script>
 

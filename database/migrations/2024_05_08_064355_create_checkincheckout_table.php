@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('room_type');
             $table->string('room_facility_type');
             $table->string('room_no');
-            $table->string('bordingtype');
-          
+            $table->string('boardingtype');
+            // $table->string('payment_method');
             $table->string('checkin');
             $table->string('checkout');
             // $table->string('payment_method');

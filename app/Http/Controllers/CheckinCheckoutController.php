@@ -39,11 +39,13 @@ class CheckinCheckoutController extends Controller
 
         // $customers = Customer::with('bookings.rooms')->get();
         $customers = Customer::whereHas('bookings', function ($query) {
-            $query->where('status', 'OnGoing');
+            $query->whereIn('status', ['OnGoing', 'Pending']);
         })->with('bookings.rooms')->get();
+        
 
         $is_edit = false;
-        $data = Booking::where('status', 'OnGoing')->get();
+        $data = Booking::whereIn('status', ['OnGoing', 'Pending'])->get();
+
         $boarding = BordingType::all();
         $data1 = Room::all();
         return view('bookings.addcheckin', compact('title', 'breadcrumbs', 'data', 'is_edit', 'data1', 'customers', 'boarding'));

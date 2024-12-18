@@ -86,7 +86,10 @@
                                                 'settings',
                                                 'bording',
                                                 'stock',
-                                                'dailystock'
+                                                'dailystock',
+                                                'widget',
+                                                'waiter'
+                                                
                                             ];
                                         @endphp
                                         @foreach ($main as $moduleName)

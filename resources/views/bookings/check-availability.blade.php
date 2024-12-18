@@ -123,14 +123,8 @@
                     formData
                 },
                 success: function(result) {
-
-
-
-                    $('.room-type').append(result['roomTypeDetails']);
-                    $('.room-details').append(result['availableRoomDetails']);
-
-                    // alert(JSON.stringify(result));
-
+                    $('.room-type').html(result['roomTypeDetails']);
+                    $('.room-details').html(result['availableRoomDetails']);
                 },
                 error: function(xhr, status, error) {
                     // Handle error

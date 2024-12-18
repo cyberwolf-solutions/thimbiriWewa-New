@@ -103,7 +103,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class)->middleware('can:manage products');
     Route::resource('meals', MealsController::class)->middleware('can:manage meals');
     Route::resource('modifiers', ModifiersController::class)->middleware('can:manage modifiers');
-    Route::resource('restaurant', RestaurantController::class)->middleware('can:manage-pos');
+    // Route::resource('restaurant', RestaurantController::class)->middleware('can:manage pos');
+    Route::resource('restaurant', RestaurantController::class);
+
     Route::get('/restaurant-note', [RestaurantController::class, 'note'])->name('restaurant.note');
     Route::get('/restaurant-in-process', [RestaurantController::class, 'process'])->name('restaurant.process');
     Route::get('/restaurant-tables', [RestaurantController::class, 'tables'])->name('restaurant.tables');
@@ -121,6 +123,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('table-arrangements', TableArrangementsController::class)->middleware('can:manage table-arrangements');
     Route::resource('orders', OrderController::class)->middleware('can:manage orders');
     Route::get('order/print/{id}', [OrderController::class, 'print'])->middleware('can:manage orders')->name('order.print');
+    Route::get('order/printk/{id}', [OrderController::class, 'printk'])->middleware('can:manage orders')->name('order.printk');
     Route::get('kot/print/{id}', [KitchenController::class, 'print'])->name('kot.print');
     Route::post('kot/delete/{id}', [KitchenController::class, 'destroy'])->name('kot.delete');
     Route::get('bot/print/{id}', [BarController::class, 'print'])->name('bot.print');
@@ -168,7 +171,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-checkincheckout-id',  [CheckoutController::class, 'getCheckinCheckoutId'] )->name('get.checkincheckout.id');
 
     Route::get('/checkout/invoice/{checkincheckout_id}', [CheckoutController::class, 'invoice'])->name('checkout.invoice');
-    Route::get('/checkout/additional/invoice/{customer_id}/{checkout_date}', [CheckoutController::class, 'additionalInvoice'])->name('checkout.additional.invoice');
+    Route::get('/checkout/invoicee/{checkincheckout_id}', [CheckoutController::class, 'invoicee'])->name('checkout.invoicee');
+    Route::get('/checkout/additional/invoice/{customer_id}/{checkout_date}/{room_no}', [CheckoutController::class, 'additionalInvoice'])->name('checkout.additional.invoice');
 
 
     //bording type

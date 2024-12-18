@@ -195,15 +195,31 @@
                     </li>
                 @endcanany
 
-                @can('manage pos')
+                {{-- @can('manage pos')
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="{{ route('restaurant.index') }}">
                             <i class="ri-menu-add-line"></i> <span>POS</span>
                         </a>
                     </li>
+                @endcan --}}
+                @canany(['manage pos', 'manage waiter'])
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('restaurant.index') }}">
+                            <i class="ri-menu-add-line"></i> <span>POS</span>
+                        </a>
+                    </li>
+                @endcanany
+
+
+                @can('manage kitchen')
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('kitchen.index') }}">
+                            <i class="ri-menu-add-line"></i> <span>Kitchen</span>
+                        </a>
+                    </li>
                 @endcan
 
-                @canany(['manage orders', 'manage kitchen', 'manage bar', 'manage tables', 'manage table-arrangements'])
+                @canany(['manage orders', 'manage bar', 'manage tables', 'manage table-arrangements'])
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#restaurant" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="restaurant">
@@ -216,11 +232,11 @@
                                         <a href="{{ route('orders.index') }}" class="nav-link">Orders</a>
                                     </li>
                                 @endcan
-                                @can('manage kitchen')
+                                {{-- @can('manage kitchen')
                                     <li class="nav-item">
                                         <a href="{{ route('kitchen.index') }}" class="nav-link">Kitchen</a>
                                     </li>
-                                @endcan
+                                @endcan --}}
                                 @can('manage bar')
                                     <li class="nav-item">
                                         <a href="{{ route('bar.index') }}" class="nav-link">Bar</a>
@@ -400,11 +416,11 @@
                                 @endcan
 
                                 @can('manage report')
-                                <li class="nav-item">
-                                    <a href="{{ route('order.ReportsIndex') }}" class="nav-link">Order Reports</a>
-                                </li>
-                            @endcan
- 
+                                    <li class="nav-item">
+                                        <a href="{{ route('order.ReportsIndex') }}" class="nav-link">Order Reports</a>
+                                    </li>
+                                @endcan
+
                             </ul>
                         </div>
                     </li>

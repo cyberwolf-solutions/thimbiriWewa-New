@@ -122,4 +122,8 @@ class KitchenController extends Controller
         }
     }
     
+
+    public function kitchen(){
+        return view('kot.index');
+    }
 }

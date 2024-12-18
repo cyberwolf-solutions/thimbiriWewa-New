@@ -264,17 +264,19 @@
 
 
                     var roomExists = false;
-                $('#room-details-table tbody tr').each(function() {
-                    if ($(this).find('td:eq(0)').text() == roomNo) {
-                        roomExists = true;
-                        return false; // Exit loop
-                    }
-                });
+                    $('#room-details-table tbody tr').each(function() {
+                        if ($(this).find('td:eq(0)').text() == roomNo) {
+                            roomExists = true;
+                            return false; // Exit loop
+                        }
+                    });
 
-                if (roomExists) {
-                    alert('This room is already added to the table. Please remove it first to add again.');
-                    return; // Prevent adding duplicate room
-                }
+                    if (roomExists) {
+                        alert(
+                            'This room is already added to the table. Please remove it first to add again.'
+                            );
+                        return; // Prevent adding duplicate room
+                    }
 
 
 
@@ -574,32 +576,39 @@
                     var roomId = $('#room-no').val();
 
                     if (customerId && roomId) {
-                        $.ajax({
-                            url: '/get-customer-orders/' + customerId + '/' + roomId,
-                            type: 'GET',
-                            success: function(response) {
-                                var unpaidOrders = response.unpaidOrders;
-                                var totalSum = 0;
-                                var unpaidOrdersDetails = '';
+                        // Delay the execution by 3 seconds (3000 milliseconds)
+                        setTimeout(function() {
+                            $.ajax({
+                                url: '/get-customer-orders/' + customerId + '/' + roomId,
+                                type: 'GET',
+                                success: function(response) {
+                                    var unpaidOrders = response.unpaidOrders;
+                                    var totalSum = 0;
+                                    var unpaidOrdersDetails = '';
 
-                                if (unpaidOrders.length > 0) {
-                                    unpaidOrders.forEach(function(order) {
-                                        var amount = parseFloat(order.total);
-                                        totalSum += amount;
-                                    });
+                                    if (unpaidOrders.length > 0) {
+                                        unpaidOrders.forEach(function(order) {
+                                            var amount = parseFloat(order.total);
+                                            totalSum += amount;
+                                        });
 
-                                    unpaidOrdersDetails = totalSum;
+                                        unpaidOrdersDetails = totalSum;
+                                    }
+
+                                    $('#additional').val(totalSum);
+
+                                    // alert('Unpaid Orders: ' + JSON.stringify(unpaidOrders));
+                                    // alert('Total Sum: ' + totalSum);
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error(xhr.responseText);
                                 }
-
-                                $('#additional').val(totalSum);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error(xhr.responseText);
-                            }
-                        });
+                            });
+                        }, 1000); // 3 seconds delay
                     }
                 }
             }
+
 
 
 

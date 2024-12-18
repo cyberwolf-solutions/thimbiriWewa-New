@@ -91,38 +91,74 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function getCustomerOrders($customerId, $roomId)
+    // public function getCustomerOrders($customerId, $roomId)
+    // {
+    //     $room = DB::table('rooms')->where('room_no', $roomId)->first();
+
+
+    //     $roomIdFromTable = $room->id;
+
+    //     dd($roomIdFromTable);
+
+    //     $orders = Order::where('customer_id', $customerId)
+    //     ->where('room_id', $roomId) // Filter by room ID
+    //     ->where('type', 'RoomDelivery') // Filter by order type
+    //     ->get();
+
+    //     // $orders = Order::where('customer_id', $customerId)
+    //     //     ->where('room_id', $roomId) // Filter by room ID
+    //     //     ->where('type', 'RoomDelivery') // Filter by order type
+    //     //     ->get();
+
+
+
+    //     Log::info('Booking Payment Details:', [
+    //         'booking_i ' => $roomId,
+    //         'room Id' => $roomId,
+
+    //     ]);
+
+
+    //     $orderIds = $orders->pluck('id');
+
+    //     $unpaidOrders = OrderPayment::whereIn('order_id', $orderIds)
+    //     ->whereIn('payment_status', ['Unpaid'])
+    //     ->get();
+    
+    //     return response()->json([
+    //         'orders' => $orders,
+    //         'orderIds' => $orderIds,
+    //         'unpaidOrders' => $unpaidOrders,
+    //     ]);
+    // }
+
+
+    public function getCustomerOrders($customerId , $roomId)
     {
         // Fetch orders for the specified customer ID where type = RoomDelivery
         // $orders = Order::where('customer_id', $customerId)
         //     ->where('type', 'RoomDelivery')
         //     ->get();
 
+        $roomIdFromTable = Room::where('room_no', $roomId)->value('id');
+
+
         $orders = Order::where('customer_id', $customerId)
-            ->where('room_id', $roomId) // Filter by room ID
-            ->where('type', 'RoomDelivery') // Filter by order type
-            ->get();
-
-
-
-        Log::info('Booking Payment Details:', [
-            'booking_i ' => $roomId,
-            'room Id' => $roomId,
-
-        ]);
+        ->where('room_id', $roomIdFromTable) // Filter by roomId as well
+        ->where('type', 'RoomDelivery')
+        ->get();
 
 
         $orderIds = $orders->pluck('id');
 
 
-
-
-
-
         $unpaidOrders = OrderPayment::whereIn('order_id', $orderIds)
-        ->whereIn('payment_status', ['Unpaid', 'Canceled'])
-        ->get();
-    
+            ->where('payment_status', 'Unpaid')
+            ->get();
+
+
+
+
         return response()->json([
             'orders' => $orders,
             'orderIds' => $orderIds,
@@ -273,7 +309,7 @@ class CheckoutController extends Controller
                         'due_amount' => $dueAmount,
                         'paid_amount' => $paidAmount,
                         'full_payed_amount' => $subtotal,
-                        'payment_method' => $request->payment_method,
+                        // 'payment_method' => $request->payment_method,
                     ]);
 
                     // Update room status to 'Available'
@@ -287,7 +323,7 @@ class CheckoutController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Checkout data has been saved successfully.',
-                'redirect' => route('checkout.invoice', [$request->checkincheckout_id])
+                'redirect' => route('checkout.invoice', [$request->booking_id])
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -302,22 +338,53 @@ class CheckoutController extends Controller
 
 
 
+    // public function invoice(string $checkincheckout_id)
+    // {
+
+    //     // $data = checkincheckout::find($checkincheckout_id);
+    //     $data = checkincheckout::where('booking_id', $checkincheckout_id)->get();
+    //     return view('bookings.invoice', compact('data'));
+    // }
+
     public function invoice(string $checkincheckout_id)
     {
+        // Retrieve all rows with the given booking_id
+        $data = checkincheckout::where('booking_id', $checkincheckout_id)->get();
+    
+        $data1 = checkincheckout::where('booking_id', $checkincheckout_id)->first();
 
-        $data = checkincheckout::find($checkincheckout_id);
-        return view('bookings.invoice', compact('data'));
+        // Pass the data to the view
+        return view('bookings.invoice', compact('data','data1'));
     }
+    public function invoicee(string $checkincheckout_id)
+    {
+        // Retrieve all rows with the given booking_id
+        // $data = checkincheckout::where('booking_id', $checkincheckout_id)->get();
+        // $data = checkincheckout::where('id', $checkincheckout_id)->get();
+        // $data1 = checkincheckout::where('id', $checkincheckout_id)->get();
 
-
-    public function additionalInvoice($customerId, $checkoutDate)
+        $data = checkincheckout::find($checkincheckout_id); 
+        // $data1 = checkincheckout::find($checkincheckout_id); 
+        // Pass the data to the view
+        return view('bookings.invoice2', compact('data'));
+    }
+    public function additionalInvoice($customerId, $checkoutDate , $room_no)
     {
 
+        $room_id = Room::where('room_no', $room_no)->value('id'); 
+        
         $cid = $customerId;
+        // dd($room_id);
 
+        // $checkinCheckout = CheckinCheckout::where('customer_id', $customerId)
+        //     ->whereDate('checkout', $checkoutDate)
+        //     ->first();
         $checkinCheckout = CheckinCheckout::where('customer_id', $customerId)
-            ->whereDate('checkout', $checkoutDate)
-            ->first();
+        ->whereDate('checkout', $checkoutDate)
+        ->where('room_no', $room_no)
+        ->first();
+
+        
 
         $updatedAt = $checkinCheckout ? $checkinCheckout->updated_at->format('Y-m-d') : null;
 
@@ -327,10 +394,12 @@ class CheckoutController extends Controller
 
             $customerId = $checkinCheckout->customer_id;
 
-
             $orders = Order::where('customer_id', $customerId)
                 ->where('type', 'RoomDelivery')
+                ->where('room_id', $room_id)
                 ->get();
+
+                // dd($room_id , $room_no);
 
             $orderIds = $orders->pluck('id');
 
@@ -339,13 +408,6 @@ class CheckoutController extends Controller
 
             $data = OrderPayment::whereDate('updated_at', $updatedAt)->get();
         }
-
-
-
-
-
-
-
         return view('bookings.additional', compact('data', 'checkinCheckout', 'orders', 'orderItems', 'cid'));
     }
 }
