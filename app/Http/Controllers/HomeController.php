@@ -49,7 +49,7 @@ class HomeController extends Controller {
 
         $Products = Product::all();
 
-        $orders1 = Order::orderBy('created_at', 'desc')->paginate(10);
+        $orders1 = Order::orderBy('created_at', 'desc')->simplePaginate(10);
 ;
 
 

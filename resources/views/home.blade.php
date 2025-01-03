@@ -69,68 +69,7 @@
             </div>
         </div>
     </div> --}}
-    @can('widget kitchen')
-        <div class="card mb-4 bg-light  shadow-lg">
-            <div class="card-header  text-white">
-                <h5 class="mb-0">Kitchen Order Tickets</h5>
-            </div>
-            <div class="card-body">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Item</th>
-                            <th>Date</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($orders1 as $item)
-                            <tr>
-                                <td>#{{ $settings->invoice($item->id) }}</td>
-
-                                <td>
-                                    @foreach ($item->items as $item1)
-                                        <div>
-                                            {{ $item1->meal ? $item1->meal->name : 'Unknown Item' }} (Qty:
-                                            {{ $item1->quantity }})
-                                        </div>
-                                    @endforeach
-                                </td>
-                                <td>{{ $item->order_date }}</td>
-                                <td>{{ $item->type }}</td>
-                                <td>{{ $item->status }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-center">
-                    {{ $orders1->links() }}
-                </div>
-            </div>
-        </div>
-    @endcan
-
-    <style>
-        .card {
-            border-radius: 10px;
-        }
-
-        .card-header {
-            border-radius: 10px 10px 0 0;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    
 
 
     @can('guest widget')
@@ -172,6 +111,72 @@
         </div>
     @endcan
 
+
+    @can('widget kitchen')
+        <div class="card mb-4 bg-light  shadow-lg">
+            <div class="card-header  text-white">
+                <h5 class="mb-0">Kitchen Order Tickets</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Item</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($orders1 as $item)
+                            <tr>
+                                <td>#{{ $settings->invoice($item->id) }}</td>
+
+                                <td>
+                                    @foreach ($item->items as $item1)
+                                        <div>
+                                            {{ $item1->meal ? $item1->meal->name : 'Unknown Item' }} (Qty:
+                                            {{ $item1->quantity }})
+                                        </div>
+                                    @endforeach
+                                </td>
+                                <td>{{ $item->order_date }}</td>
+                                <td>{{ $item->type }}</td>
+                                <td>{{ $item->status }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-center">
+                    {{ $orders1->links() }}
+
+                </div>
+            </div>
+        </div>
+    @endcan
+
+    <style>
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        
+    </style>
 
     {{-- <div class="container mt-2">
         <div class="row justify-content-center align-items-center ">
