@@ -6,112 +6,133 @@
 
 @section('content')
     <style>
-        body {
-            background-color: #FFF !important;
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-            width: 80mm; /* Thermal printer width */
-            margin: 0 auto;
-            color: #000;
-        }
-
-        .container-fluid {
-            padding: 10px;
-            border: 1px solid #000;
-            border-radius: 5px;
-        }
-
-        .header {
+        .btn {
+            padding: 7px 10px;
+            text-decoration: none;
+            border: none;
+            display: block;
             text-align: center;
-            margin-bottom: 10px;
+            margin: 7px;
+            cursor: pointer;
         }
 
-        .header img {
-            max-width: 50px;
+        .btn-info {
+            background-color: #999;
+            color: #FFF;
         }
 
-        .header h1 {
-            font-size: 16px;
-            font-weight: bold;
-            margin: 5px 0;
-        }
-
-        .header p {
-            margin: 0;
-            font-size: 12px;
-            font-weight: normal;
-        }
-
-        .order-info {
-            margin-bottom: 10px;
-        }
-
-        .order-info p {
-            margin: 2px 0;
-            font-weight: bold;
-        }
-
-        .items-section {
-            margin-bottom: 10px;
-        }
-
-        .items-section h2 {
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 5px;
-            border-bottom: 1px dashed #000;
-        }
-
-        .items-table {
+        .btn-primary {
+            background-color: #6449e7;
+            color: #FFF;
             width: 100%;
-            border-spacing: 0;
+        }
+        * {
+            font-size: 14px;
+            line-height: 19px;
+            font-family: 'Ubuntu', sans-serif;
+            text-transform: capitalize;
         }
 
-        .items-table th, .items-table td {
-            padding: 5px;
-            text-align: left;
+        h5 {
+            font-size: 1em;
+            font-weight: 400;
+            line-height: 0.1em;
         }
 
-        .items-table th {
-            background-color: #f8f8f8;
-            font-weight: bold;
+        h2 {
+            font-size: 1em;
+            font-weight: 600;
+            line-height: 0.1em;
+        }
+
+        .top, .mid, .bottom {
             border-bottom: 1px solid #000;
         }
 
-        .items-table td {
-            border-bottom: 1px dashed #ddd;
+        .top {
+            min-height: 100px;
+            text-align: center;
+            padding-bottom: -5px;
         }
 
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
-            border-top: 1px dashed #000;
-            padding-top: 5px;
-            margin-top: 10px;
+        .info {
+            margin-left: 0;
+        }
+
+        td, th, table {
+            border-collapse: collapse;
+        }
+
+        thead {
+            font-size: 0.8em;
+            border-bottom: 1px solid #000;
+        }
+
+        td, th {
+            padding: 7px 0;
+            width: 50%;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        @media print {
+            * {
+                font-size: 12px;
+                line-height: 18px;
+            }
+
+            td, th {
+                padding: 4px;
+            }
+
+            .hidden-print {
+                display: none !important;
+            }
+
+            @page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
         }
     </style>
 
-    <div class="container-fluid">
-        <!-- Header Section -->
-        <div class="header">
-            <img src="{{ asset('storage/' . $settings->logo_dark) }}" alt="Logo">
-            <h1>Thimbiri Wewa Resort</h1>
-            <p>Kitchen Order Ticket</p>
+    <div style="max-width:290px;margin:0 auto">
+        <div class="hidden-print">
+            <table>
+                <tr>
+                    <td><a href="{{ route('restaurant.index') }}" class="btn btn-info"><i class="fa fa-arrow-left"></i> Back</a></td>
+                    <td><button onclick="window.print();" class="btn btn-primary"><i class="dripicons-print"></i> Print</button></td>
+                </tr>
+            </table>
+            <br>
         </div>
 
-        <!-- Order Info -->
-        <div class="order-info">
-            <p>Order No: #{{ $settings->invoice($data->id) }}</p>
-            <p>Date: {{ \Carbon\Carbon::parse($data->order_date)->format($settings->date_format) }}</p>
-            <p>Type: {{ $data->type }}</p>
-        </div>
+        <div id="receipt-data">
+            <div class="top">
+                @if ($settings->logo_dark)
+                    <img src="{{ asset('storage/app/public/' . $settings->logo_dark) }}" height="41" width="183" style="margin:-5px 0;filter: brightness(0);">
+                @endif
+                <br>
+                <div class="centered mt-1">
+                    <strong>Thimbiri Wewa Resort</strong>
+                    <p>Kitchen Order Ticket</p>
+                </div>
+            </div>
 
-        <!-- Items Section -->
-        <div class="items-section">
-            <h2>Order Items</h2>
-            <table class="items-table">
+            <div class="mid">
+                <h5 class="mt-1">Order No: <strong>#{{ $settings->invoice($data->id) }}</strong></h5>
+                <p>Order Date: {{ \Carbon\Carbon::parse($data->order_date)->format($settings->date_format) }}</p>
+                <p>Type: {{ $data->type }}</p>
+            </div>
+
+            <table>
                 <thead>
                     <tr>
                         <th>#</th>
@@ -129,11 +150,13 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
+            <hr class="bottom">
 
-        <!-- Footer Section -->
-        <div class="footer">
-            Thank you for your order!
+            {{-- <div class="bottom">
+                <div class="centered">
+                    <p>Thank you for your order!</p>
+                </div>
+            </div> --}}
         </div>
     </div>
 @endsection
