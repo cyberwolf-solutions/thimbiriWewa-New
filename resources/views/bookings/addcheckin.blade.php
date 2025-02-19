@@ -54,6 +54,7 @@
                                         $booking = $customer->bookings->where('status', 'OnGoing')->first();
                                     @endphp
                                     <option value="{{ $customer->id }}" data-booking-id="{{ $booking ? $booking->id : '' }}"
+                                        data-bording="{{ $booking ? $booking->bording_type : '' }}"
                                         @if ($is_edit && $data->customer_id == $customer->id) selected @endif>
                                         {{ $customer->name }} | {{ $customer->contact }}
                                     </option>
@@ -61,32 +62,29 @@
                             </select>
 
                         </div>
+                        @if (!$is_edit)
+                        <div class="col-md-6 mb-3 required ">
+                            <label for="" class="form-label">Booking Id</label>
+                            <input type="text" name="booking_id" id="booking_id" class="form-control"
+                                placeholder="Room Facility" required readonly />
+                        </div>
+                    @endif
                         <div class="col-md-6 mb-3 required">
                             <label for="" class="form-label">Boarding Type</label>
-                            <select name="bordingtype" class="form-control" id="boarding_type" required
-                                @if ($is_edit) disabled @endif>
-                                <option value="">Select...</option>
-                                @foreach ($boarding as $boardings)
-                                    <option value="{{ $boardings->id }}" data-price="{{ $boardings->price }}"
-                                        @if ($is_edit && $data->boardingtype == $boardings->id) selected @endif>
-                                        {{ $boardings->name }}</option>
-                                @endforeach
-                            </select>
+                            <input type="text" name="bordingtype" id="boarding_type" id="boarding_type"  class="form-control"
+                            placeholder="Boarding Price"
+                            value="{{ $is_edit ? $boarding->firstWhere('id', $data->boardingtype)->price ?? '' : '' }}"
+                            required readonly />
+
                         </div>
-                        <div class="col-md-6 mb-3 required">
+                        <div class="col-md-6 mb-3 required" style="display: none">
                             <label for="" class="form-label">Boarding Price (One Day)</label>
                             <input type="text" name="boarding_price" id="boarding_price" class="form-control"
                                 placeholder="Boarding Price"
                                 value="{{ $is_edit ? $boarding->firstWhere('id', $data->boardingtype)->price ?? '' : '' }}"
                                 required readonly />
                         </div>
-                        @if (!$is_edit)
-                            <div class="col-md-6 mb-3 required ">
-                                <label for="" class="form-label">Booking Id</label>
-                                <input type="text" name="booking_id" id="booking_id" class="form-control"
-                                    placeholder="Room Facility" required readonly />
-                            </div>
-                        @endif
+                       
                         @if (!$is_edit)
                             <div class="col-md-6 mb-3 required">
                                 <label for="" class="form-label">Booking Rooms</label>
@@ -263,31 +261,35 @@
             $('#customer-select').on('change', function() {
                 var bookingId = $(this).find(':selected').data('booking-id');
                 $('#booking_id').val(bookingId ? bookingId : '');
+
+                var bording = $(this).find(':selected').data('bording');
+                $('#boarding_type').val(bording ? bording : '');
+
             });
         });
     </script>
 
 
     <script>
-        $(document).ready(function() {
-            // Disable the Booking Room Selector initially
-            const boardingType = $('#boarding_type').val();
-            if (!boardingType) {
-                $('#booking-room-select').prop('disabled', true);
-            }
+        // $(document).ready(function() {
+        //     // Disable the Booking Room Selector initially
+        //     const boardingType = $('#boarding_type').val();
+        //     if (!boardingType) {
+        //         $('#booking-room-select').prop('disabled', true);
+        //     }
 
-            // Enable or disable the Booking Room Selector based on Boarding Type selection
-            $('#boarding_type').change(function() {
-                const selectedBoardingType = $(this).val();
-                if (selectedBoardingType) {
-                    // Enable the Booking Room Selector
-                    $('#booking-room-select').prop('disabled', false);
-                } else {
-                    // Disable the Booking Room Selector
-                    $('#booking-room-select').prop('disabled', true);
-                }
-            });
-        });
+        //     // Enable or disable the Booking Room Selector based on Boarding Type selection
+        //     $('#boarding_type').change(function() {
+        //         const selectedBoardingType = $(this).val();
+        //         if (selectedBoardingType) {
+        //             // Enable the Booking Room Selector
+        //             $('#booking-room-select').prop('disabled', false);
+        //         } else {
+        //             // Disable the Booking Room Selector
+        //             $('#booking-room-select').prop('disabled', true);
+        //         }
+        //     });
+        // });
     </script>
     <script>
         $(document).ready(function() {

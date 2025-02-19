@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BarController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerTypeController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\IngredientsController;
 use App\Http\Controllers\KitchenController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\RoomFacilityController;
 use App\Http\Controllers\RoomSizeController;
 use App\Http\Controllers\RoomTypesController;
 use App\Http\Controllers\StockController;
+use App\Models\CustomerType;
 
 /*
 |--------------------------------------------------------------------------
@@ -183,6 +185,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('daily-stock', DailyStockController::class)->middleware('can:manage dailystock');
 
 
+    Route::get('/customer-type', [CustomerTypeController::class, 'index'])->name('customer.type');
+    Route::post('/customer-type-add', [CustomerTypeController::class, 'store'])->name('customertype.add');
+    Route::get('/customer-type-index', [CustomerTypeController::class, 'create'])->name('customertype.index');
+    Route::delete('/customer-type-delete/{checkincheckout_id}', [CustomerTypeController::class, 'destroy'])->name('customerstype.destroy');
 
 
 

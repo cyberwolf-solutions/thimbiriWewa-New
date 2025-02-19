@@ -28,7 +28,7 @@
                 <div class="page-title-right">
                     {{-- Add Buttons Here --}}
                     @can('create customers')
-                        <a href="{{ route('customers.create') }}" class="btn btn-primary btn-icon" data-bs-toggle="tooltip"
+                        <a href="{{ route('customertype.index') }}" class="btn btn-primary btn-icon" data-bs-toggle="tooltip"
                             title="Create">
                             <i class="ri-add-line"></i>
                         </a>
@@ -49,22 +49,18 @@
                     <table class="table align-middle" id="example">
                         <thead class="table-light">
                             <th>#</th>
-                            <th>Name</th>
                             <th>Type</th>
-                            <th>Contact</th>
-                            <th>Email</th>
-                            <th>Address</th>
+                            <th>Description</th>
+                           
                             <th>Action</th>
                         </thead>
                         <tbody>
                             @foreach ($data as $key => $item)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
-                                    <td>{{ $item->name }}</td>
                                     <td>{{ $item->type }}</td>
-                                    <td>{{ $item->contact }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->address }}</td>
+                                    <td>{{ $item->description }}</td>
+                                  
                                     <td>
                                         @can('view customers')
                                             <a data-url="{{ route('customers.show', [$item->id]) }}"
@@ -80,7 +76,7 @@
                                         @endcan
                                         @can('delete customers')
                                             <a href="javascript:void(0)"
-                                                data-url="{{ route('customers.destroy', [$item->id]) }}"
+                                                data-url="{{ route('customerstype.destroy', [$item->id]) }}"
                                                 class="btn btn-danger btn-sm small btn-icon delete_confirm">
                                                 <i class="bi bi-trash" data-bs-toggle="tooltip" title="Delete"></i>
                                             </a>
