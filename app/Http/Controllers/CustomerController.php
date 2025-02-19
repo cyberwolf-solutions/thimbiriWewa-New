@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\CustomerType;
 use App\Models\Settings;
 use Cassandra\Custom;
 use DateTime;
@@ -39,8 +40,9 @@ class CustomerController extends Controller {
         ];
 
         $is_edit = false;
+        $data = CustomerType::all();
 
-        return view('customers.create-edit', compact('title', 'breadcrumbs', 'is_edit'));
+        return view('customers.create-edit', compact('title','data', 'breadcrumbs', 'is_edit'));
     }
 
     /**
@@ -51,7 +53,8 @@ class CustomerController extends Controller {
             'name' => 'required|string|unique:customers,name',
             'contact' => 'required|unique:customers,contact',
             'email' => 'nullable|email|unique:customers,email',
-            'address' => 'nullable'
+            'address' => 'nullable',
+            'bordingtype' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -72,6 +75,7 @@ class CustomerController extends Controller {
                 'contact' => $request->contact,
                 'email' => $request->email,
                 'address' => $request->address,
+                'type' => $request->bordingtype,
                 'created_by' => Auth::user()->id,
             ];
 

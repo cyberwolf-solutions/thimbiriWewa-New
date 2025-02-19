@@ -29,6 +29,7 @@
                                 <option value="Dining" selected>Dining</option>
                                 <option value="TakeAway">TakeAway</option>
                                 <option value="RoomDelivery">Room Delivery</option>
+                                <option value="RoomDelivery">Add to bill</option>
                             </select>
                         </div>
                         <div class="col-md-3">

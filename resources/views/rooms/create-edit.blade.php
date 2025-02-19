@@ -76,8 +76,8 @@
                             <select name="facility" id="facility" class="form-select" required>
                                 <option value="">Select Facility</option>
                                 @foreach ($data1 as $data11)
-                                    <option value="{{ $data11->id }}" 
-                                        {{ $is_edit ?? $data->RoomFacility_id == $data11->id ? 'selected' : '' }} >
+                                    <option value="{{ $data11->id }}"
+                                        {{ $is_edit ?? $data->RoomFacility_id == $data11->id ? 'selected' : '' }}>
                                         {{ $data11->name }}
                                     </option>
                                 @endforeach
@@ -86,8 +86,8 @@
                         </div>
 
 
-            
-                        
+
+
                     </div>
 
 
@@ -111,7 +111,7 @@
                             <select name="size" class="form-control js-example-basic-single" id="" required>
                                 <option value="">Select...</option>
                                 @foreach ($sizes as $size)
-                                    <option value="{{ $size->size }}" 
+                                    <option value="{{ $size->size }}"
                                         {{ $is_edit && $data->size == $size->size ? 'selected' : '' }}>
                                         {{ $size->size }}
                                     </option>
@@ -146,18 +146,110 @@
                                 value="{{ $is_edit ? $data->name : '' }}" placeholder="Enter Quantity" required />
                         </div>
 
-                        <div class="row">
-
-                            <div class="col-md-6 mb-3">
-                                <label for="" class="form-label">Description</label>
-                                <textarea class="form-control" name="description" id="" rows="1" placeholder="Enter Description">{{ $is_edit ? $data->description : '' }}</textarea>
-                            </div>
-    
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Description</label>
+                            <textarea class="form-control" name="description" id="" rows="1" placeholder="Enter Description">{{ $is_edit ? $data->description : '' }}</textarea>
                         </div>
 
+                        {{-- <div class="col-md-6 mb-3 required">
+                            <label for="" class="form-label">Boarding Type</label>
+                            <select name="bordingtype" class="form-control" id="boarding_type" required
+                                @if ($is_edit) disabled @endif>
+                                <option value="">Select...</option>
+                                @foreach ($boarding as $boardings)
+                                    <option value="{{ $boardings->id }}" data-price="{{ $boardings->price }}"
+                                        @if ($is_edit && $data->boardingtype == $boardings->id) selected @endif>
+                                        {{ $boardings->name }}</option>
+                                @endforeach
+                            </select>
+                        </div> --}}
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Room Details</h5>
+                                        <button class="btn btn-success btn-sm" id="addPricingRow"><i class="ri-add-line"></i> Add Row</button>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-bordered" id="roomTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Boarding type</th>
+                                                    <th>Customer type</th>
+                                                    <th>Currency</th>
+                                                    <th>Rate</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="roomTableBody">
+                                                <tr class="pricing-row" data-index="0">
+                                                    <td>
+                                                        <select name="pricing[0][boarding_type_id]" class="form-control" required>
+                                                            <option value="">Select...</option>
+                                                            @foreach ($boarding as $boardings)
+                                                                <option value="{{ $boardings->id }}">{{ $boardings->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select name="pricing[0][customer_type_id]" class="form-control" required>
+                                                            <option value="">Select...</option>
+                                                            @foreach ($cus as $customer)
+                                                                <option value="{{ $customer->id }}">{{ $customer->type }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select name="pricing[0][currency]" class="form-control" required>
+                                                            <option value="lkr">LKR</option>
+                                                            <option value="usd">USD</option>
+                                                            <option value="euro">EURO</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="text" class="form-control" name="pricing[0][rate]" required></td>
+                                                    <td><button class="btn btn-danger btn-sm removeRow"><i class="ri-delete-bin-line"></i></button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            let rowIndex = 1;
+                        
+                            // Add new row
+                            document.getElementById('addPricingRow').addEventListener('click', function () {
+                                let row = document.querySelector('.pricing-row').cloneNode(true);
+                                let rowBody = document.getElementById('roomTableBody');
+                                row.setAttribute('data-index', rowIndex);
+                                
+                                // Update the name attributes for form submission
+                                row.querySelector('select[name="pricing[0][boarding_type_id]"]').setAttribute('name', 'pricing[' + rowIndex + '][boarding_type_id]');
+                                row.querySelector('select[name="pricing[0][customer_type_id]"]').setAttribute('name', 'pricing[' + rowIndex + '][customer_type_id]');
+                                row.querySelector('select[name="pricing[0][currency]"]').setAttribute('name', 'pricing[' + rowIndex + '][currency]');
+                                row.querySelector('input[name="pricing[0][rate]"]').setAttribute('name', 'pricing[' + rowIndex + '][rate]');
+                                
+                                // Append the new row to the table body
+                                rowBody.appendChild(row);
+                                
+                                rowIndex++;
+                            });
+                        
+                            // Remove row
+                            document.getElementById('roomTable').addEventListener('click', function (event) {
+                                if (event.target && event.target.matches('button.removeRow')) {
+                                    let row = event.target.closest('tr');
+                                    row.remove();
+                                }
+                            });
+                        </script>
+                        
                     </div>
 
-                   
+
 
                     <div class="row mb-3">
                         <div class="col-12 text-end">
@@ -169,9 +261,55 @@
                 </form>
             </div>
         </div>
+        <!-- Table with Add Row Button -->
+      
+
+
     </div>
 
+    <script>
+       $(document).ready(function () {
+    let index = 1;
 
+    $("#addPricingRow").click(function () {
+        let newRow = `
+        <tr>
+            <td>
+                <select name="pricing[${index}][boarding_type_id]" class="form-control" required>
+                    <option value="">Select...</option>
+                    @foreach ($boarding as $boardings)
+                        <option value="{{ $boardings->id }}">{{ $boardings->name }}</option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <select name="pricing[${index}][customer_type_id]" class="form-control" required>
+                    <option value="">Select...</option>
+                    @foreach ($cus as $customer)
+                        <option value="{{ $customer->id }}">{{ $customer->type }}</option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <select name="pricing[${index}][currency]" class="form-control" required>
+                    <option value="lkr">LKR</option>
+                    <option value="usd">USD</option>
+                    <option value="euro">EURO</option>
+                </select>
+            </td>
+            <td><input type="number" class="form-control" name="pricing[${index}][rate]" required></td>
+            <td><button type="button" class="btn btn-danger btn-sm removeRow">Remove</button></td>
+        </tr>`;
+        $("#pricingTableBody").append(newRow);
+        index++;
+    });
+
+    $(document).on("click", ".removeRow", function () {
+        $(this).closest("tr").remove();
+    });
+});
+
+    </script>
     {{-- <script>
         function alertQuantity() {
             // Retrieve the value of the quantity input field
@@ -181,5 +319,4 @@
             alert("Quantity entered: " + quantity);
         }
     </script> --}}
-
 @endsection

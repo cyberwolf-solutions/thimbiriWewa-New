@@ -122,7 +122,7 @@ class CheckinCheckoutController extends Controller
                 $customer = checkincheckout::create([
                     'booking_id' => $request->booking_id,
                     'customer_id' => $request->customer_id,
-                    'bordingtype' => $request->bordingtype,
+                    'boardingtype' => $request->bordingtype,
                     'created_by' => Auth::user()->id,
                     'room_type' => $roomData['roomId'],
                     'room_no' => $roomData['roomNo'],

@@ -84,6 +84,9 @@
                                     <li class="nav-item">
                                         <a href="{{ route('customers.index') }}" class="nav-link">Guests</a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('customer.type') }}" class="nav-link">Guest type</a>
+                                    </li>
                                 @endcan
                             </ul>
                         </div>
@@ -328,7 +331,7 @@
                     </li>
                 @endcan
 
-                @can('manage bording')
+                {{-- @can('manage bording')
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#bordingtype" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="bordingtype">
@@ -342,7 +345,7 @@
                             </ul>
                         </div>
                     </li>
-                @endcan
+                @endcan --}}
 
 
                 @canany(['manage rooms'])
@@ -363,6 +366,9 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('room-size.index') }}" class="nav-link">Room Size</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('bording-type.index') }}" class="nav-link">Boarding Type</a>
                                     </li>
                                 @endcan
                             </ul>

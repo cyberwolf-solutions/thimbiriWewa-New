@@ -6,6 +6,8 @@
                 <select name="" id="customer" class="form-control js-example-basic-single">
                     <option value="0" {{ $customer == 0 ? 'selected' : '' }} data-name="Walking Customer">Walking
                         Customer</option>
+                    <option value="1" data-name="In house customer">In house customer
+                    </option>
                     @foreach ($customers as $item)
                         <option value="{{ $item->id }}" {{ $customer == $item->id ? 'selected' : '' }}
                             data-name="{{ $item->name }}">{{ $item->name }} |

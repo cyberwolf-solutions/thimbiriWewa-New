@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\BookingsRooms;
+use App\Models\BordingType;
 use App\Models\Customer;
+use App\Models\CustomerType;
 use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\Settings;
@@ -12,6 +14,7 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class BookingController extends Controller
@@ -34,9 +37,7 @@ class BookingController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -69,6 +70,7 @@ class BookingController extends Controller
                 'contact' => $request->contact,
                 'email' => $request->email,
                 'address' => $request->address,
+                'type'=>$request->custype,
                 'created_by' => Auth::user()->id,
             ];
 
@@ -82,6 +84,8 @@ class BookingController extends Controller
                     'no_of_adults' => $request->no_of_adults,
                     'no_of_children' => $request->no_of_children,
                     'customer_id' => $Customer->id,
+                    'customer_type' => $request->custype,
+                    'bording_type'=>$request->bording,
                     'status' => $status,
                     'created_by' => Auth::user()->id,
                 ];
@@ -350,13 +354,13 @@ class BookingController extends Controller
     public function checkAvailability()
     {
         $title = 'Check Availability';
-
+        $cus = CustomerType::all();
         $breadcrumbs = [
             // ['label' => 'First Level', 'url' => '', 'active' => false],
             ['label' => $title, 'url' => '', 'active' => true],
         ];
-
-        return view('bookings.check-availability', compact('title', 'breadcrumbs'));
+        $data = BordingType::all();
+        return view('bookings.check-availability', compact('title','cus', 'data', 'breadcrumbs'));
     }
 
 
@@ -365,20 +369,15 @@ class BookingController extends Controller
      */
     public function getAvailableRooms(Request $request)
     {
-
-
-        // dd($request->all());
-
         $formData = $request->formData;
         $count = $formData['no_of_adults'] + $formData['no_of_children'];
-
+        $boardingTypeId = $formData['bording']; // Get the selected boarding type
+    
         try {
-
-            // $availability = Booking::where('checkin', '>=', $formData['checkin'])
-            //     ->orWhere('checkout', '<=', $formData['checkout'])->get();
             $checkin = $formData['checkin'];
             $checkout = $formData['checkout'];
-
+    
+            // Fetch bookings with overlapping dates
             $availability = Booking::where(function ($query) use ($checkin, $checkout) {
                 $query->where('checkin', '>=', $checkin)
                     ->where('checkin', '<', $checkout);
@@ -389,84 +388,107 @@ class BookingController extends Controller
                 $query->where('checkin', '<', $checkin)
                     ->where('checkout', '>', $checkout);
             })->get();
-
-            $roomTypeCount = null;
-
+    
+            // Collect booked room IDs
             $bookedRooms = [];
             foreach ($availability as $aval) {
                 foreach ($aval->rooms as $room) {
                     array_push($bookedRooms, $room->id);
                 }
             }
-
+    
             $availabilityIds = $availability->pluck('id')->toArray();
+    
+            // Modify the query to include the selected boarding type
+            $availableRoomsQuery = Room::where('capacity', '>=', $count)
+                ->where('status', 'Available')
+                ->whereNotIn('id', $availabilityIds);
 
-            if (count($availability) != 0) {
-                $availableRooms = Room::where('capacity', '>=', $count)->where('status', 'Available')->whereNotIn('id', $availabilityIds)->get();
-            } else {
-                $availableRooms = Room::where('capacity', '>=', $count)->where('status', 'Available')->get();
+    
+            // If a boarding type is selected, filter rooms by the selected boarding type from RoomPricing
+            if ($boardingTypeId) {
+                // Instead of limiting to a single match, ensure all rooms with that boarding type are included
+                $availableRoomsQuery = $availableRoomsQuery->whereHas('pricings', function ($query) use ($boardingTypeId) {
+                    $query->where('boarding_type_id', $boardingTypeId);
+                });
             }
 
+
+            // Fetch available rooms
+            $availableRooms = $availableRoomsQuery->get();
+    
+            // Group by room types and format the details
+            $roomTypeCount = [];
             foreach ($availableRooms as $rooms) {
-                $roomTypeCount[$rooms['types']['name']] = (isset($roomTypeCount[$rooms['types']['name']]) ? $roomTypeCount[$rooms['types']['name']] + 1 : 1);
+                // Group by room types if needed
+                $roomTypeCount[$rooms->types->name] = isset($roomTypeCount[$rooms->types->name]) ? $roomTypeCount[$rooms->types->name] + 1 : 1;
+           
             }
-
+    
             $roomTypeArr = [];
             $roomTypeDetails = $availableRoomDetails = null;
-
-            //Get Available Room Types - Single, Double
-            if ($roomTypeCount != null) {
+    
+            // Get Available Room Types - Single, Double
+            if ($roomTypeCount) {
                 $roomTypeArr = array_chunk($roomTypeCount, 3, true);
                 foreach ($roomTypeArr as $row) {
                     $roomTypeDetails = '<div class="row">';
                     foreach ($row as $k => $item) {
                         $roomTypeDetails .= '<div class="col-md-4">';
-                        $roomTypeDetails .= '<h4><strong> ' . $k . ' </strong> : ' . $item . ' </h4>';
+                        $roomTypeDetails .= '<h4><strong>' . $k . ' </strong>: ' . $item . ' </h4>';
                         $roomTypeDetails .= '</div>';
+
                     }
                     $roomTypeDetails .= '</div>';
+
                 }
+
             }
-
+    
+            // Formatting the available room details
             $settings = Settings::latest()->first();
-            if ($availableRooms != null) {
+            if ($availableRooms->isNotEmpty()) {
                 $availableRooms = $availableRooms->chunk(3);
+                $availableRoomDetails = ''; // Initialize outside the loop
+            
                 foreach ($availableRooms as $row) {
-                    $availableRoomDetails = '<div class="row">';
+                    $availableRoomDetails .= '<div class="row">'; // Use .= to append instead of overwrite
                     foreach ($row as $item) {
-                        if ($item->image_url != null) {
-                            $image = 'uploads/rooms/' . $item->image_url;
-                        } else {
-                            $image = 'https://placehold.co/50';
-                        }
-
+                        $image = $item->image_url ? 'uploads/rooms/' . $item->image_url : 'https://placehold.co/50';
+                        Log::info('Available rooms result', ['rooms' => $item]);
+            
                         $availableRoomDetails .= '<div class="col-md-4">';
                         $availableRoomDetails .= '<div class="form-check form-check-inline">';
-                        $availableRoomDetails .= '<input class="form-check-input form-control" type="checkbox" name="room[]" id=""
-                                                    value="' . $item['id'] . '">';
+                        $availableRoomDetails .= '<input class="form-check-input form-control" type="checkbox" name="room[]" value="' . $item->id . '">';
                         $availableRoomDetails .= '<div class="card border">';
-                        $availableRoomDetails .= '<img src=" ' . $image . ' " alt="" class="card-img-top">';
+                        $availableRoomDetails .= '<img src="' . $image . '" alt="" class="card-img-top">';
                         $availableRoomDetails .= '<div class="card-body text-center">';
-                        $availableRoomDetails .= '<p class="card-text small"> Name: ' . $item['name'] . ' </p>';
+                        $availableRoomDetails .= '<p class="card-text small"> Name: ' . $item->name . ' </p>';
                         $availableRoomDetails .= '<p class="card-text small"> Room Facility: ' . $item->roomFacility->name . ' </p>';
-                        $availableRoomDetails .= '<p class="card-text small"> Room No: ' . $item['room_no'] . ' </p>';
-                        $availableRoomDetails .= '<p class="card-text small"> Capacity: ' . $item['capacity'] . ' </p>';
-                        $availableRoomDetails .= '<p class="card-text small"> Room Type: ' . $item['types']['name'] . ' </p>';
-                        $availableRoomDetails .= '<p class="card-text small"> Price(Per Night): ' . $settings->currency . ' ' . number_format($item['price'], 2) . ' </p>';
+                        $availableRoomDetails .= '<p class="card-text small"> Room No: ' . $item->room_no . ' </p>';
+                        $availableRoomDetails .= '<p class="card-text small"> Capacity: ' . $item->capacity . ' </p>';
+                        $availableRoomDetails .= '<p class="card-text small"> Room Type: ' . $item->types->name . ' </p>';
+                        $availableRoomDetails .= '<p class="card-text small"> Price (Per Night): ' . $settings->currency . ' ' . number_format($item->price, 2) . ' </p>';
                         $availableRoomDetails .= '</div>';
                         $availableRoomDetails .= '</div>';
                         $availableRoomDetails .= '</div>';
                         $availableRoomDetails .= '</div>';
                     }
-                    $availableRoomDetails .= '</div>';
+                    $availableRoomDetails .= '</div>'; // Close the row after processing the chunk
                 }
             }
-
-            return response()->json(['roomTypeDetails' => $roomTypeDetails, 'availableRoomDetails' => $availableRoomDetails]);
+            
+            return response()->json([
+                'roomTypeDetails' => $roomTypeDetails,
+                'availableRoomDetails' => $availableRoomDetails
+            ]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
+    
+    
+    
 
     /**
      * Get Room Details
@@ -551,7 +573,8 @@ class BookingController extends Controller
         return view('bookings.roomstatus', compact('data', 'title', 'breadcrumbs', 'type', 'data1'));
     }
 
-    public function bookingReport(){
+    public function bookingReport()
+    {
         $title = 'Booking Report';
 
         $breadcrumbs = [
@@ -559,6 +582,6 @@ class BookingController extends Controller
             ['label' => $title, 'url' => '', 'active' => true],
         ];
         $data = Booking::all();
-        return view ('reports.bookingReports' , compact('data'));
+        return view('reports.bookingReports', compact('data'));
     }
 }
