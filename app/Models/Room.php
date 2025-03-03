@@ -25,7 +25,10 @@ class Room extends Model {
         'deleted_by',
         'RoomFacility_id'
     ];
-
+    public function pricings() {
+        return $this->hasMany(RoomPricing::class);
+    }
+    
     public function type() {
         return $this->belongsTo(RoomType::class, 'type');
     }

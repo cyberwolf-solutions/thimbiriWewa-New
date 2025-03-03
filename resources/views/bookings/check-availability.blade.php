@@ -58,6 +58,18 @@
                             <input type="number" step="any" class="form-control bg-transparent" id=""
                                 value="0" name="no_of_children">
                         </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="" class="form-label">Boarding type</label>
+
+                            <select name="bording" class="form-control" required>
+                                <option value="">Select...</option>
+                                @foreach ($data as $boardings)
+                                    <option value="{{ $boardings->id }}">{{ $boardings->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                     </div>
                     <div class="row show-rooms visually-hidden mt-3">
                         <h5>Available Room Types</h5>
@@ -87,6 +99,22 @@
                                 <label for="" class="form-label">Address</label>
                                 <textarea class="form-control cust" name="address" id="" rows="1" placeholder="Enter Address"></textarea>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="" class="form-label">Customer Type</label>
+                                <select name="custype" id="customerType" class="form-control" required>
+                                    <option value="">Select...</option>
+                                    @foreach ($cus as $customer)
+                                        <option value="{{ $customer->type }}">{{ $customer->type }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <!-- Hidden input field -->
+                            <div class="col-md-6 mb-3" id="onlineField" style="display: none;">
+                                <label for="" class="form-label">Price</label>
+                                <input type="text" name="online_booking_id" class="form-control" placeholder="Enter price">
+                            </div>
+
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -178,5 +206,15 @@
             e.preventDefault();
             $('.check-availability').attr('disabled', 'disabled');
         });
+
+        $(document).ready(function() {
+        $('#customerType').on('change', function() {
+            if ($(this).val() === 'online') {
+                $('#onlineField').show();
+            } else {
+                $('#onlineField').hide();
+            }
+        });
+    });
     </script>
 @endsection

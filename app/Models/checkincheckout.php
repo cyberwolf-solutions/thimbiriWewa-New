@@ -26,7 +26,7 @@ class checkincheckout extends Model
         'full_payment',
         'note',
         'full_payed_amount',
-        'bordingtype',
+        'boardingtype',
         'sub_total',
         'discount',
 

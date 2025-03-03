@@ -15,6 +15,7 @@ class Customer extends Model {
         'contact',
         'email',
         'address',
+        'type',
         'created_by',
         'updated_by',
         'deleted_by'

@@ -12,6 +12,8 @@ return new class extends Migration {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->integer('customer_id');
+            $table->string('customer_type');
+            $table->string('bording_type');
             $table->string('checkin');
             $table->string('checkout');
             $table->integer('no_of_adults')->default(0);

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BordingType;
+use App\Models\Customer;
+use App\Models\CustomerType;
 use App\Models\Room;
 use App\Models\RoomFacilities;
+use App\Models\RoomPricing;
 use App\Models\RoomSize;
 use App\Models\RoomType;
 use App\Models\Settings;
@@ -12,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use DateTime;
+use Illuminate\Support\Facades\Log;
 
 class RoomController extends Controller
 {
@@ -26,9 +31,17 @@ class RoomController extends Controller
             // ['label' => 'First Level', 'url' => '', 'active' => false],
             ['label' => $title, 'url' => '', 'active' => true],
         ];
+
+        $customers = Customer::whereHas('bookings', function ($query) {
+            $query->whereIn('status', ['OnGoing', 'Pending']);
+        })->with('bookings.rooms')->get();
+        
+
+        $boarding = BordingType::all();
+
         $data = Room::all();
         $data1 = RoomFacilities::all();
-        return view('rooms.index', compact('title', 'breadcrumbs', 'data' , 'data1'));
+        return view('rooms.index', compact('title', 'breadcrumbs','customers','boarding', 'data' , 'data1'));
     }
 
     /**
@@ -44,80 +57,98 @@ class RoomController extends Controller
             ['label' => $title, 'url' => route('rooms.index'), 'active' => false],
             ['label' => 'Create', 'url' => '', 'active' => true],
         ];
+        $customers = Customer::whereHas('bookings', function ($query) {
+            $query->whereIn('status', ['OnGoing', 'Pending']);
+        })->with('bookings.rooms')->get();
+        
 
+        $boarding = BordingType::all();
+        $cus = CustomerType::all();
         $is_edit = false;
         $types = RoomType::all();
         $sizes = RoomSize::all();
 
-        return view('rooms.create-edit', compact('title', 'breadcrumbs', 'is_edit', 'types', 'sizes' ,  'data1'));
+        return view('rooms.create-edit', compact('title', 'breadcrumbs','cus','customers','boarding', 'is_edit', 'types', 'sizes' ,  'data1'));
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+ 
     public function store(Request $request)
-    
-{
+    {
+        // dd($request->all());
+        Log::info('Pricing Data:', $request->pricing);
 
-    // dd($request->quantity);
-    $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255|unique:rooms,name',
-        'room_no' => 'required',
-        'type' => 'required',
-        'price' => 'required|numeric',
-        'status' => 'required',
-        'description' => 'nullable',
-        'image' => 'nullable|image|max:5000',
-        'capacity' => 'required|integer',
-        'size' => 'required',
-        'facility' => 'required',
-        'quantity' => 'required|integer|min:1'
-    ]);
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:rooms,name',
+            'room_no' => 'required',
+            'type' => 'required',
+            'price' => 'required|numeric',
+            'status' => 'required',
+            'description' => 'nullable',
+            'image' => 'nullable|image|max:5000',
+            'capacity' => 'required|integer',
+            'size' => 'required',
+            'facility' => 'required',
+            'quantity' => 'required|integer|min:1',
+            // 'pricing' => 'required|array',
+            // 'pricing.*.boarding_type_id' => 'required|exists:bording_type,id',
+            // 'pricing.*.customer_type_id' => 'required|exists:customer_types,id',
+            // 'pricing.*.currency' => 'required|in:lkr,usd,euro',
+            // 'pricing.*.rate' => 'required|numeric|min:0'
+        ]);
     
-    if ($validator->fails()) {
-        $all_errors = null;
-        foreach ($validator->errors()->messages() as $errors) {
-            foreach ($errors as $error) {
-                $all_errors .= $error . "<br>";
+        if ($validator->fails()) {
+            $errors = collect($validator->errors()->all())->implode('<br>');
+            return response()->json(['success' => false, 'message' => $errors]);
+        }
+    
+        $image_url = null;
+        if ($request->hasFile('image')) {
+            $preferred_name = trim($request->name);
+            $image_url = $preferred_name . '.' . $request->file('image')->extension();
+            $request->file('image')->move(public_path('uploads/rooms'), $image_url);
+        }
+    
+        try {
+            $roomIds = []; // Array to store created room IDs
+    
+            for ($i = 0; $i < $request->quantity; $i++) {
+                $roomData = [
+                    'name' => $request->name,
+                    'room_no' => $request->room_no . ($i + 1), 
+                    'type' => $request->type,
+                    'price' => $request->price,
+                    'status' => $request->status,
+                    'description' => $request->description,
+                    'image_url' => $image_url,
+                    'capacity' => $request->capacity,
+                    'size' => $request->size,
+                    'created_by' => Auth::id(),
+                    'RoomFacility_id' => $request->facility
+                ];
+    
+                $room = Room::create($roomData);
+                $roomIds[] = $room->id; // Store room ID
             }
+    
+            // Save pricing details for all created rooms
+            foreach ($roomIds as $roomId) {
+                foreach ($request->pricing as $pricing) {
+                    RoomPricing::create([
+                        'room_id' => $roomId,
+                        'boarding_type_id' => $pricing['boarding_type_id'],
+                        'customer_type_id' => $pricing['customer_type_id'],
+                        'currency' => $pricing['currency'],
+                        'rate' => $pricing['rate']
+                    ]);
+                }
+            }
+    
+            return response()->json(['success' => true, 'message' => 'Room(s) created successfully!', 'url' => route('rooms.index')]);
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false, 'message' => 'Something went wrong! ' . $th->getMessage()]);
         }
-        return response()->json(['success' => false, 'message' => $all_errors]);
     }
     
-    $image_url = null;
-    if ($request->file('image') != null) {
-        $preferred_name = trim($request->name);
-        $image_url = $preferred_name . '.' . $request['image']->extension();
     
-        // Move the image upload code outside the loop
-        $request['image']->move(public_path('uploads/rooms'), $image_url);
-    }
-    
-    try {
-        for ($i = 0; $i < $request->quantity; $i++) {
-            $data = [
-                'name' => $request->name,
-                'room_no' => $request->room_no . ($i + 1), 
-                'type' => $request->type,
-                'price' => $request->price,
-                'status' => $request->status,
-                'description' => $request->description,
-                'image_url' => $image_url, // Use the same image URL for each room
-                'capacity' => $request->capacity,
-                'size' => $request->size,
-                'created_by' => Auth::user()->id,
-                'RoomFacility_id' => $request->facility
-            ];
-    
-            $Room = Room::create($data);
-        }
-    
-        return json_encode(['success' => true, 'message' => 'Room(s) created', 'url' => route('rooms.index')]);
-    } catch (\Throwable $th) {
-        return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th->getMessage()]);
-    }
-}
-
 
     /**
      * Display the specified resource.
