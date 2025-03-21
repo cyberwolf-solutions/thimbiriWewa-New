@@ -50,9 +50,9 @@
                             <label for="" class="form-label">Ingredient</label>
                             <select name="ingredient" class="form-control js-example-basic-single" id="ingredient" required>
                                 <option value="">Select...</option>
-                                @foreach ($data as $item)
+                                @foreach ($ingredientData as $item)
                                     <option value="{{ $item->id }}" data-price="{{ $item->quantity }}">
-                                        {{ $item->name }}</option>
+                                        {{ $item->name }}   
                                     </option>
                                 @endforeach
                             </select>
