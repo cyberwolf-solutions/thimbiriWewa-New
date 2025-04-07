@@ -88,7 +88,9 @@
                                                 'stock',
                                                 'dailystock',
                                                 'widget',
-                                                'waiter'
+                                                'waiter',
+                                                'boardconsumption',
+                                                'buffet',
                                                 
                                             ];
                                         @endphp

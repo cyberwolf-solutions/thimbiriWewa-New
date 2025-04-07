@@ -116,12 +116,24 @@ class PermissionSeeder extends Seeder {
             ['name' => 'Employee report', 'guard_name' => 'web'],
             ['name' => 'Product report', 'guard_name' => 'web'],
             ['name' => 'Booking report', 'guard_name' => 'web'],
+            ['name' => 'Buffet report', 'guard_name' => 'web'],
+            ['name' => 'BoardConsumption report', 'guard_name' => 'web'],
 
 
             ['name' => 'manage bording', 'guard_name' => 'web'],
             ['name' => 'edit bording', 'guard_name' => 'web'],
             ['name' => 'delete bording', 'guard_name' => 'web'],
 
+            ['name' => 'manage buffet', 'guard_name' => 'web'],
+            ['name' => 'edit buffet', 'guard_name' => 'web'],
+            ['name' => 'view buffet', 'guard_name' => 'web'],
+            ['name' => 'create buffet', 'guard_name' => 'web'],
+            ['name' => 'delete buffet', 'guard_name' => 'web'],
+            ['name' => 'manage boardconsumption', 'guard_name' => 'web'],
+            ['name' => 'edit boardconsumption', 'guard_name' => 'web'],
+            ['name' => 'view boardconsumption', 'guard_name' => 'web'],
+            ['name' => 'delete boardconsumption', 'guard_name' => 'web'],
+            ['name' => 'create boardconsumption', 'guard_name' => 'web'],
 
             ['name' => 'manage stock', 'guard_name' => 'web'],
             ['name' => 'manage dailystock', 'guard_name' => 'web'],

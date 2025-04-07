@@ -32,6 +32,19 @@
                                 <option value="RoomDelivery">Add to bill</option>
                             </select>
                         </div>
+                        <!-- Customer Dropdown -->
+                        <div class="col border-end pe-2">
+                            <select name="customer_id" id="customer" class="form-control js-example-basic-single" disabled>
+                                <option value="0" selected>OUTSIDE CUSTOMER</option>
+                                @foreach ($customerss as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ $customerss->contains('id', $item->id) ? 'selected' : '' }}
+                                        data-name="{{ $item->name }}">
+                                        {{ $item->name }} | {{ $item->contact }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-3">
                             <input type="text" class="form-control" placeholder="Search product by names"
                                 id="searchInput">
@@ -262,7 +275,7 @@
                                             <div class="row align-items-center p-2 ">
                                                 <button class="btn btn-primary text-dark fw-bold"
                                                     style="background-color: #378CE7;"
-                                                    onclick="checkout()">Checkout</button>
+                                                    onclick="checkoutHandler()">Checkout</button>
                                             </div>
                                         </div>
                                     </div>
@@ -305,6 +318,26 @@
                 }, 50);
             }
         </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                let customerDropdown = document.getElementById("customer"); // Get the select element
+                let mealItems = document.querySelectorAll(".meal-item"); // Get all meal items
+
+                mealItems.forEach(item => {
+                    item.addEventListener("click", function() {
+                        let category = this.getAttribute(
+                            "data-category"); // Get clicked meal's category
+
+                        if (category === "1") { // Assuming 1 is the category_id for 'Buffet'
+                            customerDropdown.removeAttribute("disabled"); // Enable dropdown
+                        } else {
+                            customerDropdown.setAttribute("disabled", "true"); // Disable dropdown
+                        }
+                    });
+                });
+            });
+        </script>
+
         <script>
             var discount = 0;
             var discount_val = 0;
@@ -437,7 +470,7 @@
                 $(document).on('change', '.room', function() {
                     room = $(this).val(); // Update the room variable with the selected value
                     customer = $(this).data(
-                    'customer-id'); // Update the customer variable with the selected customer ID
+                        'customer-id'); // Update the customer variable with the selected customer ID
 
                     // Optional: Debug to verify values
                     console.log('Room ID:', room);
@@ -686,6 +719,25 @@
         </script>
 
         <script>
+            function checkoutHandler() {
+                const customerSelect = document.getElementById('customer');
+                const customerSelected = customerSelect && customerSelect.value;
+
+                // Check if a customer is selected
+                if (customerSelected) {
+                    if(customerSelected==0){
+                        checkout();
+                    }else{
+                        checkoutWithCustomer(); // Call checkout with customer
+                    }
+                   
+                } else {
+                    checkout(); // Call checkout without customer
+                }
+            }
+
+
+
             function checkout() {
 
                 beep();
@@ -756,7 +808,51 @@
 
             }
         </script>
+        <script>
+            function checkoutWithCustomer() {
+                if (cart.length === 0) {
+                    display_error('Add one or more items to the cart');
+                    return;
+                }
+                const customerSelect = document.getElementById('customer');
+                const customer = customerSelect && !customerSelect.disabled ? customerSelect.value : '';
 
+                const formData = new FormData();
+                formData.append('cart', JSON.stringify(cart)); // Send the cart as a JSON string
+                formData.append('customer', customer); // Send customer ID
+                formData.append('customer_checkout', true); // Optional flag
+
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('restaurantcheckoutcustomermeal') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.success) {
+                            display_success(response.message);
+                            if (response.urls) {
+                                window.open(response.urls.print, '_blank');
+                                setTimeout(() => window.open(response.urls.printk, '_blank'), 200);
+                            }
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            display_error(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            display_error(xhr.responseJSON.message);
+                        } else {
+                            display_error(`${xhr.status}: ${xhr.statusText}`);
+                        }
+                    }
+                });
+            }
+        </script>
         <script>
             var previouslyClickedItem = null;
 

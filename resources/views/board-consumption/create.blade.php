@@ -40,44 +40,33 @@
         <div class="card">
             <div class="card-body">
                 <form method="POST" class="ajax-form"
-                    action="{{ route('buffet.store') }}">
+                    action="{{ route('boardconsumption.store') }}">
                     @csrf
                     @if ($is_edit)
                     @method('PATCH') 
                     @endif  
                     <div class="row">
-                        <div class="col-md-6 mb-3 required">
-                            <label for="" class="form-label">Type</label>
-                            <input type="text" name="name" id="" class="form-control"
-                                value="Buffet" readonly required />
+                        <div class="col-md-4 mb-3 required">
+                            <label for="" class="form-label">Full board</label>
+                            <input type="text" name="fb" id="" class="form-control"
+                                value="{{ $is_edit ? $data->full_board : '' }}" placeholder="Enter Price" required />
                         </div>
-                        <div class="col-md-6 mb-3 required">
-                            <label for="" class="form-label">Name</label>
-                            <select name="name" class="form-control js-example-basic-single" id="" required>
-                                <option value="">Select...</option>
-                                @php
-                                    $name = ['Breakfast buffet', 'Lunch buffet','Dinner buffet'];
-                                @endphp
-                                @foreach ($name as $item)
-                                    <option value="{{ $item }}"
-                                        {{ $is_edit && $data->type == $item ? 'selected' : '' }}>
-                                        {{ $item }}</option>
-                                @endforeach  
-                            </select>
+                        <div class="col-md-4 mb-3 required">
+                            <label for="" class="form-label">Half Board</label>
+                            <input type="text" name="hb" id="" class="form-control"
+                                value="{{ $is_edit ? $data->half_board : '' }}" placeholder="Enter Price" required />
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mb-3 required">
-                            <label for="" class="form-label">Price</label>
-                            <input type="text" name="price" id="" class="form-control"
-                                value="{{ $is_edit ? $data->price : '' }}" placeholder="Enter Price" required />
+                        <div class="col-md-4 mb-3 required">
+                            <label for="" class="form-label">BB</label>
+                            <input type="text" name="bb" id="" class="form-control"
+                                value="{{ $is_edit ? $data->bb : '' }}" placeholder="Enter Price" required />
                         </div>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-12 text-end">
                             <button type="button" class="btn btn-light me-2"
-                                onclick="window.location='{{ route('buffet.index') }}'">Cancel</button>
+                                onclick="window.location='{{ route('board_consumption') }}'">Cancel</button>
                             <button class="btn btn-primary">{{ $is_edit ? 'Update' : 'Create' }}</button>
                         </div>
                     </div>

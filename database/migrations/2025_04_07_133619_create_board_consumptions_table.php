@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('buffets', function (Blueprint $table) {
+        Schema::create('board_consumptions', function (Blueprint $table) {
             $table->id();
-            $table->enum('name', ['Breakfast buffet', 'Lunch buffet','Dinner buffet']);
-            $table->float('price')->default(0);
+            $table->integer('half_board');
+            $table->integer('full_board');
+            $table->integer('bb');
+            $table->date('date');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('buffets');
+        Schema::dropIfExists('board_consumptions');
     }
 };
