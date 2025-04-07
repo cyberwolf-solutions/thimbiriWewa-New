@@ -70,7 +70,7 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3 required">
-                            <label for="" class="form-label">Kitchen consumption Quantity</label>
+                            <label for="" class="form-label">Daily consumption Quantity</label>
                             <input type="text" name="quanity" id="" class="form-control"
                                 placeholder="Enter quantity" required />
                         </div>
