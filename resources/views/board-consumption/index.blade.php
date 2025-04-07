@@ -27,8 +27,8 @@
 
                 <div class="page-title-right">
                     {{-- Add Buttons Here --}}
-                    @can('create buffet')
-                        <a href="{{ route('buffet.create') }}" class="btn btn-primary btn-icon" data-bs-toggle="tooltip"
+                    @can('create boardconsumption')
+                        <a href="{{ route('boardconsumption.create') }}" class="btn btn-primary btn-icon" data-bs-toggle="tooltip"
                             title="Create">
                             <i class="ri-add-line"></i>
                         </a>
@@ -45,33 +45,22 @@
                 <div class="table-responsive">
                     <table class="table align-middle" id="example">
                         <thead class="table-light">
-                            <th>Name</th>
-                            <th>Price</th>
+                            <th>Date</th>
+                            <th>Full board</th>
+                            <th>Half board</th>
+                            <th>BB</th>
 
                         </thead>
                         <tbody>
                             @foreach ($data as $key => $item)
 
                                 <tr>
-                                    <td>{{ $item->name }}</td>
-                                    <td>{{ $item->price }}</td>
+                                    <td>{{ $item->date }}</td>
+                                    <td>{{ $item->full_board }}</td>
+                                    <td>{{ $item->half_board }}</td>
+                                    <td>{{ $item->bb }}</td>
 
-                                    <td>
-                                       
-                                        {{-- @can('edit categories')
-                                            <a href="{{ route('buffet.edit', [$item->id]) }}"
-                                                class="btn btn-secondary btn-sm small btn-icon">
-                                                <i class="bi bi-pencil-square" data-bs-toggle="tooltip" title="Edit"></i>
-                                            </a>
-                                        @endcan --}}
-                                        @can('delete buffet')
-                                            <a href="javascript:void(0)"
-                                                data-url="{{ route('buffet.destroy', [$item->id]) }}"
-                                                class="btn btn-danger btn-sm small btn-icon delete_confirm">
-                                                <i class="bi bi-trash" data-bs-toggle="tooltip" title="Delete"></i>
-                                            </a>
-                                        @endcan
-                                    </td>
+                                
                                 </tr>
                             @endforeach
                         </tbody>   

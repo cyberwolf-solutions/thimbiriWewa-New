@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Buffet;
 use App\Models\Meal;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class BuffetController extends Controller
 {
@@ -20,13 +22,13 @@ class BuffetController extends Controller
         ];
 
         $data = Buffet::all();
-        
 
-        return view('buffet.index', compact('title', 'breadcrumbs','data'));
+
+        return view('buffet.index', compact('title', 'breadcrumbs', 'data'));
     }
 
 
- 
+
     public function create()
     {
         $title = 'Buffet';
@@ -38,23 +40,23 @@ class BuffetController extends Controller
 
         $is_edit = false;
 
-        return view('buffet.create', compact('title', 'breadcrumbs','is_edit'));
+        return view('buffet.create', compact('title', 'breadcrumbs', 'is_edit'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'price' => 'required|numeric',            
+            'price' => 'required|numeric',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => implode('<br>', $validator->errors()->all())
             ]);
         }
-    
+
         try {
             // Check if Buffet with the same name already exists
             $existingBuffet = Buffet::where('name', $request->name)->first();
@@ -64,20 +66,20 @@ class BuffetController extends Controller
                     'message' => 'A buffet with this name already exists. Please update the existing buffet or delete it before creating a new one.'
                 ]);
             }
-    
+
             // Insert new Buffet record
             $buffet = Buffet::create([
                 'name' => $request->name,
                 'price' => $request->price,
                 'created_by' => Auth::id(),
             ]);
-    
+
             // Update Meal price if a meal with the same name exists
             $meal = Meal::where('name', $request->name)->first();
             if ($meal) {
                 $meal->update(['unit_price' => $request->price]);
             }
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Buffet created successfully!',
@@ -91,7 +93,8 @@ class BuffetController extends Controller
         }
     }
 
-    public function update(Request $request, string $id) {
+    public function update(Request $request, string $id)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:15|unique:categories,name,' . $id,
             'type' => 'required',
@@ -111,7 +114,7 @@ class BuffetController extends Controller
             return response()->json(['success' => false, 'message' => $all_errors]);
         }
 
-        if($request->file('image') != null) {
+        if ($request->file('image') != null) {
             $preferred_name = trim($request->name);
             $image_url = $preferred_name . '.' . $request['image']->extension();
         }
@@ -120,11 +123,11 @@ class BuffetController extends Controller
             $data = [
                 'name' => $request->name,
                 'price' => $request->price,
-              
+
                 'updated_by' => Auth::user()->id,
             ];
 
-            if($request->file('image') != null) {
+            if ($request->file('image') != null) {
                 $data['image_url'] = $image_url;
             }
 
@@ -149,7 +152,8 @@ class BuffetController extends Controller
         }
     }
 
-    public function edit(string $id) {
+    public function edit(string $id)
+    {
         $title = 'Buffet';
 
         $breadcrumbs = [
@@ -167,22 +171,23 @@ class BuffetController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id) {
+    public function destroy(string $id)
+    {
         try {
             // Find the Buffet entry
             $buffet = Buffet::find($id);
-    
+
             if (!$buffet) {
                 return response()->json(['success' => false, 'message' => 'Buffet not found.']);
             }
-    
+
             // Update Meal price to 0 where Meal name matches Buffet name
             Meal::where('name', $buffet->name)->update(['unit_price' => 0.00]);
-    
+
             // Soft delete the Buffet
             $buffet->update(['deleted_by' => Auth::user()->id]);
             $buffet->delete();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Buffet deleted successfully!',
@@ -196,4 +201,40 @@ class BuffetController extends Controller
         }
     }
 
+
+
+    public function consumption()
+    {
+        $title = 'Buffet consumption';
+    
+        $breadcrumbs = [
+            ['label' => $title, 'url' => '', 'active' => true],
+        ];
+    
+        $data = DB::table('order_items')
+            ->selectRaw('DATE(created_at) as date, itemable_id, COUNT(*) as count')
+            ->whereIn('itemable_id', [1, 2, 3])
+            ->groupByRaw('DATE(created_at), itemable_id')
+            ->get();
+    
+        $mealData = DB::table('customer_board_meals')
+            ->selectRaw('DATE(created_at) as date, mealtype as itemable_id, COUNT(*) as count')
+            ->whereIn('mealtype', [1, 2, 3])
+            ->groupByRaw('DATE(created_at), mealtype')
+            ->get();
+    
+        // Merge both datasets by date and item ID
+        $results = [];
+    
+        foreach ($data as $row) {
+            $results[$row->date][$row->itemable_id]['order_items'] = $row->count;
+        }
+    
+        foreach ($mealData as $row) {
+            $results[$row->date][$row->itemable_id]['customer_board_meals'] = $row->count;
+        }
+    
+        return view('buffet.consumption', compact('title', 'breadcrumbs', 'results'));
+    }
+    
 }
