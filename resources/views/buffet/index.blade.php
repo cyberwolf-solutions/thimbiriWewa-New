@@ -55,6 +55,23 @@
                                 <tr>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->price }}</td>
+
+                                    <td>
+                                       
+                                        {{-- @can('edit categories')
+                                            <a href="{{ route('buffet.edit', [$item->id]) }}"
+                                                class="btn btn-secondary btn-sm small btn-icon">
+                                                <i class="bi bi-pencil-square" data-bs-toggle="tooltip" title="Edit"></i>
+                                            </a>
+                                        @endcan --}}
+                                        @can('delete categories')
+                                            <a href="javascript:void(0)"
+                                                data-url="{{ route('buffet.destroy', [$item->id]) }}"
+                                                class="btn btn-danger btn-sm small btn-icon delete_confirm">
+                                                <i class="bi bi-trash" data-bs-toggle="tooltip" title="Delete"></i>
+                                            </a>
+                                        @endcan
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>   

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('buffets', function (Blueprint $table) {
             $table->id();
-            $table->enum('name', ['Breakfast', 'Lunch','Dinner']);
+            $table->enum('name', ['Breakfast buffet', 'Lunch buffet','Dinner buffet']);
             $table->float('price')->default(0);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

@@ -191,6 +191,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/customer-type-add', [CustomerTypeController::class, 'store'])->name('customertype.add');
     Route::get('/customer-type-index', [CustomerTypeController::class, 'create'])->name('customertype.index');
     Route::delete('/customer-type-delete/{checkincheckout_id}', [CustomerTypeController::class, 'destroy'])->name('customerstype.destroy');
+    Route::delete('/buffet-delete/{checkincheckout_id}', [BuffetController::class, 'destroy'])->name('buffet.destroy');
+    Route::get('/buffet-edit/{checkincheckout_id}', [BuffetController::class, 'update'])->name('buffet.edit');
 
 
 

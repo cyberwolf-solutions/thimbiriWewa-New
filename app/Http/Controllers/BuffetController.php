@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buffet;
+use App\Models\Meal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -46,28 +47,37 @@ class BuffetController extends Controller
             'name' => 'required',
             'price' => 'required|numeric',            
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => implode('<br>', $validator->errors()->all())
             ]);
         }
-
-
-
+    
         try {
-            $data = [
+            // Check if Buffet with the same name already exists
+            $existingBuffet = Buffet::where('name', $request->name)->first();
+            if ($existingBuffet) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A buffet with this name already exists. Please update the existing buffet or delete it before creating a new one.'
+                ]);
+            }
+    
+            // Insert new Buffet record
+            $buffet = Buffet::create([
                 'name' => $request->name,
                 'price' => $request->price,
                 'created_by' => Auth::id(),
-            ];
-
-           // $product = Product::create($data);
-           $expense = Buffet::create($data);
-
-            
-
+            ]);
+    
+            // Update Meal price if a meal with the same name exists
+            $meal = Meal::where('name', $request->name)->first();
+            if ($meal) {
+                $meal->update(['unit_price' => $request->price]);
+            }
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Buffet created successfully!',
@@ -79,5 +89,111 @@ class BuffetController extends Controller
                 'message' => 'Something went wrong! ' . $th->getMessage()
             ]);
         }
-    }  
+    }
+
+    public function update(Request $request, string $id) {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:15|unique:categories,name,' . $id,
+            'type' => 'required',
+            'description' => 'nullable',
+            'image' => 'nullable|max:5000'
+        ]);
+
+        if ($validator->fails()) {
+            $all_errors = null;
+
+            foreach ($validator->errors()->messages() as $errors) {
+                foreach ($errors as $error) {
+                    $all_errors .= $error . "<br>";
+                }
+            }
+
+            return response()->json(['success' => false, 'message' => $all_errors]);
+        }
+
+        if($request->file('image') != null) {
+            $preferred_name = trim($request->name);
+            $image_url = $preferred_name . '.' . $request['image']->extension();
+        }
+
+        try {
+            $data = [
+                'name' => $request->name,
+                'price' => $request->price,
+              
+                'updated_by' => Auth::user()->id,
+            ];
+
+            if($request->file('image') != null) {
+                $data['image_url'] = $image_url;
+            }
+
+            $Category = Buffet::find($id)->update($data);
+
+            // if($Category != null){
+            //     if($request->file('image') != null) {
+            //         $preferred_name = trim($request->name);
+            //         $path = public_path() . '/uploads/categories/' . $preferred_name . '.' . $request['image']->extension();
+            //         if(file_exists($path)) {
+            //             unlink($path);
+            //         }
+
+            //         $request['image']->move(public_path('uploads/categories'), $image_url);
+            //     }
+            // }
+
+            return json_encode(['success' => true, 'message' => 'Category updated', 'url' => route('categories.index')]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return json_encode(['success' => false, 'message' => 'Something went wrong!']);
+        }
+    }
+
+    public function edit(string $id) {
+        $title = 'Buffet';
+
+        $breadcrumbs = [
+            // ['label' => 'First Level', 'url' => '', 'active' => false],
+            ['label' => $title, 'url' => route('buffet.index'), 'active' => false],
+            ['label' => 'Edit', 'url' => '', 'active' => true],
+        ];
+
+        $is_edit = true;
+        $data = Buffet::find($id);
+
+        return view('buffet.index', compact('title', 'breadcrumbs', 'is_edit', 'data'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id) {
+        try {
+            // Find the Buffet entry
+            $buffet = Buffet::find($id);
+    
+            if (!$buffet) {
+                return response()->json(['success' => false, 'message' => 'Buffet not found.']);
+            }
+    
+            // Update Meal price to 0 where Meal name matches Buffet name
+            Meal::where('name', $buffet->name)->update(['unit_price' => 0.00]);
+    
+            // Soft delete the Buffet
+            $buffet->update(['deleted_by' => Auth::user()->id]);
+            $buffet->delete();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Buffet deleted successfully!',
+                'url' => route('buffet.index')
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong! ' . $th->getMessage()
+            ]);
+        }
+    }
+
 }

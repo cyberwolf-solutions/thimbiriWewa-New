@@ -12,14 +12,17 @@ use App\Models\Modifier;
 use PhpParser\Modifiers;
 use App\Events\notifyBot;
 use App\Events\notifyKot;
+use App\Models\Booking;
 use App\Models\OrderItem;
 use App\Models\OrderNote;
 use App\Models\Restaurant;
 use App\Models\OrderPayment;
 use Illuminate\Http\Request;
 use App\Models\BookingsRooms;
+use App\Models\Buffet;
 use App\Models\OrderItemModifier;
 use App\Models\ModifiersCategories;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
@@ -42,8 +45,12 @@ class RestaurantController extends Controller
 
         $categories = Category::all()->where('type', 'Restaurant');
         $meals = Meal::all();
+        $buffet = Buffet::all();
+          // Get customers whose checkout date is NOT passed
+    $customerss = Customer::whereIn('id', Booking::where('checkout', '>=', Carbon::today())->pluck('customer_id'))
+    ->get();
 
-        return view('restaurant.index', compact('title', 'breadcrumbs', 'categories', 'meals'));
+        return view('restaurant.index', compact('title', 'breadcrumbs', 'categories', 'meals','buffet','customerss'));
     }
 
     /**

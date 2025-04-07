@@ -21,7 +21,7 @@
                         <div class="col">
                             <button type="button"
                                 class="btn btn-soft-danger btn-label waves-effect waves-light form-control"
-                                onclick="window.location.reload()"><i
+                                onclick="window.location.reload()"><i 
                                     class="mdi mdi-cancel label-icon align-middle fs-16 me-2"></i>Clear All</button>
                         </div>
                         <div class="col border-end pe-2">
@@ -31,6 +31,17 @@
                                 <option value="RoomDelivery">Room Delivery</option>
                                 <option value="RoomDelivery">Add to bill</option>
                             </select>
+                        </div>
+                        <div class="col border-end pe-2">
+                            <select name="customer_id" id="customer" class="form-control js-example-basic-single" disabled>
+                                @foreach ($customerss as $item)
+                                    <option value="{{ $item->id }}" {{ $customerss->contains('id', $item->id) ? 'selected' : '' }}
+                                        data-name="{{ $item->name }}">
+                                        {{ $item->name }} | {{ $item->contact }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            
                         </div>
                         <div class="col-md-3">
                             <input type="text" class="form-control" placeholder="Search product by names"
@@ -305,6 +316,25 @@
                 }, 50);
             }
         </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let customerDropdown = document.getElementById("customer"); // Get the select element
+                let mealItems = document.querySelectorAll(".meal-item"); // Get all meal items
+        
+                mealItems.forEach(item => {
+                    item.addEventListener("click", function () {
+                        let category = this.getAttribute("data-category"); // Get clicked meal's category
+                        
+                        if (category === "1") { // Assuming 1 is the category_id for 'Buffet'
+                            customerDropdown.removeAttribute("disabled"); // Enable dropdown
+                        } else {
+                            customerDropdown.setAttribute("disabled", "true"); // Disable dropdown
+                        }
+                    });
+                });
+            });
+        </script>
+        
         <script>
             var discount = 0;
             var discount_val = 0;

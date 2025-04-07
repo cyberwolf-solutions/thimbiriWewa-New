@@ -56,7 +56,7 @@
                             <select name="name" class="form-control js-example-basic-single" id="" required>
                                 <option value="">Select...</option>
                                 @php
-                                    $name = ['Breakfast', 'Lunch','Dinner'];
+                                    $name = ['Breakfast buffet', 'Lunch buffet','Dinner buffet'];
                                 @endphp
                                 @foreach ($name as $item)
                                     <option value="{{ $item }}"
