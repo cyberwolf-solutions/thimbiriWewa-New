@@ -14,7 +14,7 @@ class DailyStockController extends Controller
     //
     public function index()
     {
-        $title = 'Kitchen Products';
+        $title = 'Daily Consumption';
 
         $breadcrumbs = [
             // ['label' => 'First Level', 'url' => '', 'active' => false],
