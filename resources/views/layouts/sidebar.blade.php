@@ -132,9 +132,14 @@
                                 @endcan
                                 @can('manage dailystock')
                                     <li class="nav-item">
-                                        <a href="{{ route('daily-stock.index') }}" class="nav-link">Kitchen</a>
+                                        <a href="{{ route('daily-stock.index') }}" class="nav-link">Daily Consumption</a>
                                     </li>
                                 @endcan
+                                @can('manage stock')
+                                <li class="nav-item">
+                                    <a href="{{ route('buffet.index') }}" class="nav-link">Buffet</a>
+                                </li>
+                            @endcan
                             </ul>
                         </div>
                     </li>

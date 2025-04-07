@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ingredient;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 
@@ -18,6 +19,7 @@ class StockController extends Controller
         ];
         //$data = Stock::all();
         $data = Stock::with('ingredient.unit')->get();
-        return view('stock.index', compact('title', 'breadcrumbs', 'data'));
+        $ing = Ingredient::all();
+        return view('stock.index', compact('title', 'breadcrumbs', 'data','ing'));
     }
 }

@@ -49,7 +49,7 @@
                             <th>Action</th> --}}
                         </thead>
                         <tbody>
-                            @foreach ($data as $key => $item)
+                            @foreach ($ing as $key => $item)
                                
                                 <tr>
                                     <td>{{ $key + 1 }}</td>

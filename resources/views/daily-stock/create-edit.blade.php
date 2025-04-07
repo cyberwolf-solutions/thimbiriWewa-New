@@ -50,9 +50,9 @@
                             <label for="" class="form-label">Ingredient</label>
                             <select name="ingredient" class="form-control js-example-basic-single" id="ingredient" required>
                                 <option value="">Select...</option>
-                                @foreach ($data as $item)
+                                @foreach ($ingredientData as $item)
                                     <option value="{{ $item->id }}" data-price="{{ $item->quantity }}">
-                                        {{ $item->name }}</option>
+                                        {{ $item->name }}   
                                     </option>
                                 @endforeach
                             </select>
@@ -70,7 +70,7 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3 required">
-                            <label for="" class="form-label">Kitchen consumption Quantity</label>
+                            <label for="" class="form-label">Daily consumption Quantity</label>
                             <input type="text" name="quanity" id="" class="form-control"
                                 placeholder="Enter quantity" required />
                         </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\MealsController;
 use App\Http\Controllers\ModifiersController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\RestaurantController;
@@ -105,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class)->middleware('can:manage products');
     Route::resource('meals', MealsController::class)->middleware('can:manage meals');
     Route::resource('modifiers', ModifiersController::class)->middleware('can:manage modifiers');
+    Route::resource('buffet', BuffetController::class)->middleware('can:manage modifiers');    
     // Route::resource('restaurant', RestaurantController::class)->middleware('can:manage pos');
     Route::resource('restaurant', RestaurantController::class);
 
