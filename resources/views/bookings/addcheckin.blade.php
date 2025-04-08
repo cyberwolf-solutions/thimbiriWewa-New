@@ -274,7 +274,7 @@
                 const checkout = selectedOption.data('checkout');
                 const roomPrice = parseFloat(selectedOption.data('total-ammount')) || 0;
                 const boardingPrice = parseFloat($('#boarding_price').val()) || 0;
-                alert(roomPrice);
+             
                 if ($('#rooms-table tbody').find(`tr[data-room-id="${roomId}"]`).length > 0) {
                     alert("This room has already been added.");
                     return; // Exit function to prevent adding the same room again
