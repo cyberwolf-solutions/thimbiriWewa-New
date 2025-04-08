@@ -109,6 +109,18 @@
                                 </select>
                             </div>
                             
+                            <div class="col-md-6 mb-3">
+                                <label for="" class="form-label">Currency</label>
+                                <select name="currency" id="customerType" class="form-control" required>
+                                    <option value="">Select...</option>
+                                   
+                                        <option value="LKR">LKR</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EURO">EURO</option>
+                                   
+                                </select>
+                            </div>
+
                             <!-- Hidden input field -->
                             <div class="col-md-6 mb-3" id="onlineField" style="display: none;">
                                 <label for="" class="form-label">Price</label>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BoardConsumption;
 use App\Models\User;
 use App\Models\Booking;
 use App\Models\Product;
@@ -11,6 +12,7 @@ use App\Models\Order;
 use App\Models\Supplier;
 use App\Models\Purchases;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReportsController extends Controller
 {
@@ -117,6 +119,53 @@ class ReportsController extends Controller
         return view('reports.orderindex', compact('title', 'breadcrumbs', 'data'));
     }
 
+    public function buffet()
+    {
+        $title = 'Buffet consumption Report';
+
+        $breadcrumbs = [
+            // ['label' => 'First Level', 'url' => '', 'active' => false],
+            ['label' => $title, 'url' => '', 'active' => true],
+        ];
+        $data = DB::table('order_items')
+            ->selectRaw('DATE(created_at) as date, itemable_id, COUNT(*) as count')
+            ->whereIn('itemable_id', [1, 2, 3])
+            ->groupByRaw('DATE(created_at), itemable_id')
+            ->get();
+
+        $mealData = DB::table('customer_board_meals')
+            ->selectRaw('DATE(created_at) as date, mealtype as itemable_id, COUNT(*) as count')
+            ->whereIn('mealtype', [1, 2, 3])
+            ->groupByRaw('DATE(created_at), mealtype')
+            ->get();
+
+        // Merge both datasets by date and item ID
+        $results = [];
+
+        foreach ($data as $row) {
+            $results[$row->date][$row->itemable_id]['order_items'] = $row->count;
+        }
+
+        foreach ($mealData as $row) {
+            $results[$row->date][$row->itemable_id]['customer_board_meals'] = $row->count;
+        }
+
+        return view('reports.buffetindex', compact('title', 'breadcrumbs', 'results'));
+    }
+
+    public function boardcobsumption()
+    {
+        $title = 'Board Consumption Report';
+
+        $breadcrumbs = [
+            // ['label' => 'First Level', 'url' => '', 'active' => false],
+            ['label' => $title, 'url' => '', 'active' => true],
+        ];
+        $data = BoardConsumption::all();
+        return view('reports.boardcobsumptionindex', compact('title', 'breadcrumbs', 'data'));
+    }
+
+
     public function searchByType(Request $request)
     {
         $title = 'Order Report';
@@ -135,6 +184,5 @@ class ReportsController extends Controller
 
         // return response()->json($data);
         return view('reports.orderindex', compact('title', 'breadcrumbs', 'data'));
-
     }
 }

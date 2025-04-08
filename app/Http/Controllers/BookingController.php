@@ -8,6 +8,7 @@ use App\Models\BordingType;
 use App\Models\Customer;
 use App\Models\CustomerType;
 use App\Models\Room;
+use App\Models\RoomPricing;
 use App\Models\RoomType;
 use App\Models\Settings;
 use Carbon\Carbon;
@@ -16,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -52,6 +54,7 @@ class BookingController extends Controller
             'name' => 'required'
         ]);
 
+        // Validate request data
         if ($validator->fails()) {
             $all_errors = null;
 
@@ -64,62 +67,138 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => $all_errors]);
         }
 
+        DB::beginTransaction(); // Start a database transaction for better error handling
+
         try {
+            // Create customer data
             $cust_data = [
                 'name' => $request->name,
                 'contact' => $request->contact,
                 'email' => $request->email,
                 'address' => $request->address,
-                'type'=>$request->custype,
+                'type' => $request->custype,
                 'created_by' => Auth::user()->id,
             ];
 
             $Customer = Customer::create($cust_data);
 
-            if ($Customer != null) {
-                $status = (($request->checkin > date("Y-m-d")) ? 'Pending' : 'OnGoing');
-                $booking_data = [
-                    'checkin' => $request->checkin,
-                    'checkout' => $request->checkout,
-                    'no_of_adults' => $request->no_of_adults,
-                    'no_of_children' => $request->no_of_children,
-                    'customer_id' => $Customer->id,
-                    'customer_type' => $request->custype,
-                    'bording_type'=>$request->bording,
-                    'status' => $status,
+            if (!$Customer) {
+                throw new \Exception("Failed to create customer.");
+            }
+
+            // Determine booking status based on check-in date
+            $status = (($request->checkin > date("Y-m-d")) ? 'Pending' : 'OnGoing');
+
+            // Booking data
+            $booking_data = [
+                'checkin' => $request->checkin,
+                'checkout' => $request->checkout,
+                'no_of_adults' => $request->no_of_adults,
+                'no_of_children' => $request->no_of_children,
+                'customer_id' => $Customer->id,
+                'customer_type' => $request->custype,
+                'currency' => $request->currency,
+                'bording_type' => $request->bording,
+                'status' => $status,
+                'created_by' => Auth::user()->id,
+            ];
+
+            // Create the booking record
+            $Booking = Booking::create($booking_data);
+
+            if (!$Booking) {
+                throw new \Exception("Failed to create booking.");
+            }
+
+            // Loop through each room selected by the user
+            foreach ($request->room as $room) {
+                // Get the room price from the 'rooms' table
+                $roomData = Room::find($room);
+                if (!$roomData) {
+                    throw new \Exception("Room not found.");
+                }
+
+                $roomPrice = $roomData->price; // Room price from rooms table
+
+                // Find the customer_type_id based on the customer type name
+                $customerType = CustomerType::where('type', $request->custype)->first();
+
+                // Check if customer type is found
+                if (!$customerType) {
+                    return json_encode(['success' => false, 'message' => 'Customer type not found.']);
+                }
+
+                // Now, you can use the customer_type_id in your room pricing query
+                $roomPricing = RoomPricing::where('room_id', $room)
+                    ->where('boarding_type_id', $request->bording)
+                    ->where('customer_type_id', $customerType->id)  // Use the ID here
+                    ->where('currency', $request->currency)
+                    ->first();
+
+                // Check if pricing is found
+                if (!$roomPricing) {
+                    // \Log::error("Room pricing not found for room_id: $room, boarding_type_id: " . $request->bording . ", customer_type_id: " . $customerType->id . ", currency: " . $request->currency);
+                    return json_encode(['success' => false, 'message' => 'Room pricing not found for the selected options.']);
+                }
+
+
+                // Calculate the number of days between check-in and check-out
+                $checkinDate = new \DateTime($request->checkin);
+                $checkoutDate = new \DateTime($request->checkout);
+                $days = $checkoutDate->diff($checkinDate)->days;
+
+
+                $cost = ($roomPrice + ($roomPrice * ($roomPricing->rate / 100))) * $days;
+
+                // Add room data to the 'bookings_rooms' table
+                $broom_data = [
+                    'booking_id' => $Booking->id,
+                    'room_id' => $room,
+                    'days' => $days,
+                    'rate' => $roomPricing->rate,
+                    'cost' => $cost,
                     'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
                 ];
 
-                $Booking = Booking::create($booking_data);
+                // Create the bookings_rooms record
+                $BookingRoom = BookingsRooms::create($broom_data);
 
-                if ($Booking != null) {
-                    foreach ($request->room as $room) {
-                        $broom_data = [
-                            'booking_id' => $Booking->id,
-                            'room_id' => $room,
-                            'created_by' => Auth::user()->id,
-                        ];
+                if (!$BookingRoom) {
+                    throw new \Exception("Failed to assign room to booking.");
+                }
 
-                        $BookingRoom = BookingsRooms::create($broom_data);
+                // If the status is 'OnGoing', update the room status
+                if ($status == 'OnGoing') {
+                    $room_data = [
+                        'status' => 'Reserved',
+                        'updated_by' => Auth::user()->id,
+                    ];
 
-                        if ($status == 'OnGoing') {
-                            $room_data = [
-                                'status' => 'Reserved',
-                                'updated_by' => Auth::user()->id,
-                            ];
+                    // Ensure the room status is updated
+                    $roomUpdate = Room::find($room)->update($room_data);
 
-                            $room = Room::find($room)->update($room_data);
-                        }
+                    if (!$roomUpdate) {
+                        throw new \Exception("Failed to update room status.");
                     }
                 }
             }
 
-            return json_encode(['success' => true, 'message' => 'Booking created', 'url' => route('bookings.index')]);
-        } catch (\Throwable $th) {
-            //throw $th;
-            return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th]);
+            // Commit the transaction if everything is successful
+            DB::commit();
+
+            return json_encode(['success' => true, 'message' => 'Booking created successfully', 'url' => route('bookings.index')]);
+        } catch (\Exception $e) {
+            // Rollback any changes if something fails
+            DB::rollBack();
+
+            // Return the error message
+            return json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+
+
+
 
     /**
      * Display the specified resource.
@@ -360,7 +439,7 @@ class BookingController extends Controller
             ['label' => $title, 'url' => '', 'active' => true],
         ];
         $data = BordingType::all();
-        return view('bookings.check-availability', compact('title','cus', 'data', 'breadcrumbs'));
+        return view('bookings.check-availability', compact('title', 'cus', 'data', 'breadcrumbs'));
     }
 
 
@@ -372,11 +451,11 @@ class BookingController extends Controller
         $formData = $request->formData;
         $count = $formData['no_of_adults'] + $formData['no_of_children'];
         $boardingTypeId = $formData['bording']; // Get the selected boarding type
-    
+
         try {
             $checkin = $formData['checkin'];
             $checkout = $formData['checkout'];
-    
+
             // Fetch bookings with overlapping dates
             $availability = Booking::where(function ($query) use ($checkin, $checkout) {
                 $query->where('checkin', '>=', $checkin)
@@ -388,7 +467,7 @@ class BookingController extends Controller
                 $query->where('checkin', '<', $checkin)
                     ->where('checkout', '>', $checkout);
             })->get();
-    
+
             // Collect booked room IDs
             $bookedRooms = [];
             foreach ($availability as $aval) {
@@ -396,15 +475,15 @@ class BookingController extends Controller
                     array_push($bookedRooms, $room->id);
                 }
             }
-    
+
             $availabilityIds = $availability->pluck('id')->toArray();
-    
+
             // Modify the query to include the selected boarding type
             $availableRoomsQuery = Room::where('capacity', '>=', $count)
                 ->where('status', 'Available')
                 ->whereNotIn('id', $availabilityIds);
 
-    
+
             // If a boarding type is selected, filter rooms by the selected boarding type from RoomPricing
             if ($boardingTypeId) {
                 // Instead of limiting to a single match, ensure all rooms with that boarding type are included
@@ -416,18 +495,17 @@ class BookingController extends Controller
 
             // Fetch available rooms
             $availableRooms = $availableRoomsQuery->get();
-    
+
             // Group by room types and format the details
             $roomTypeCount = [];
             foreach ($availableRooms as $rooms) {
                 // Group by room types if needed
                 $roomTypeCount[$rooms->types->name] = isset($roomTypeCount[$rooms->types->name]) ? $roomTypeCount[$rooms->types->name] + 1 : 1;
-           
             }
-    
+
             $roomTypeArr = [];
             $roomTypeDetails = $availableRoomDetails = null;
-    
+
             // Get Available Room Types - Single, Double
             if ($roomTypeCount) {
                 $roomTypeArr = array_chunk($roomTypeCount, 3, true);
@@ -437,26 +515,23 @@ class BookingController extends Controller
                         $roomTypeDetails .= '<div class="col-md-4">';
                         $roomTypeDetails .= '<h4><strong>' . $k . ' </strong>: ' . $item . ' </h4>';
                         $roomTypeDetails .= '</div>';
-
                     }
                     $roomTypeDetails .= '</div>';
-
                 }
-
             }
-    
+
             // Formatting the available room details
             $settings = Settings::latest()->first();
             if ($availableRooms->isNotEmpty()) {
                 $availableRooms = $availableRooms->chunk(3);
                 $availableRoomDetails = ''; // Initialize outside the loop
-            
+
                 foreach ($availableRooms as $row) {
                     $availableRoomDetails .= '<div class="row">'; // Use .= to append instead of overwrite
                     foreach ($row as $item) {
                         $image = $item->image_url ? 'uploads/rooms/' . $item->image_url : 'https://placehold.co/50';
                         Log::info('Available rooms result', ['rooms' => $item]);
-            
+
                         $availableRoomDetails .= '<div class="col-md-4">';
                         $availableRoomDetails .= '<div class="form-check form-check-inline">';
                         $availableRoomDetails .= '<input class="form-check-input form-control" type="checkbox" name="room[]" value="' . $item->id . '">';
@@ -477,7 +552,7 @@ class BookingController extends Controller
                     $availableRoomDetails .= '</div>'; // Close the row after processing the chunk
                 }
             }
-            
+
             return response()->json([
                 'roomTypeDetails' => $roomTypeDetails,
                 'availableRoomDetails' => $availableRoomDetails
@@ -486,9 +561,9 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => $th->getMessage()]);
         }
     }
-    
-    
-    
+
+
+
 
     /**
      * Get Room Details

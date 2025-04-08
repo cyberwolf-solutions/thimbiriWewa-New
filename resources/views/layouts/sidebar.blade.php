@@ -132,8 +132,23 @@
                                 @endcan
                                 @can('manage dailystock')
                                     <li class="nav-item">
-                                        <a href="{{ route('daily-stock.index') }}" class="nav-link">Kitchen</a>
+                                        <a href="{{ route('daily-stock.index') }}" class="nav-link">Daily Consumption</a>
                                     </li>
+                                @endcan
+                                @can('manage buffet')
+                                    <li class="nav-item">
+                                        <a href="{{ route('buffet.index') }}" class="nav-link">Buffet</a>
+                                    </li>
+                                @endcan
+                                @can('manage buffet')
+                                <li class="nav-item">
+                                    <a href="{{ route('buffet_consumption') }}" class="nav-link">Buffet consumption</a>
+                                </li>
+                            @endcan
+                                @can('manage boardconsumption')
+                                <li class="nav-item">
+                                    <a href="{{ route('board_consumption') }}" class="nav-link">Board consumption</a>
+                                </li>
                                 @endcan
                             </ul>
                         </div>
@@ -426,6 +441,18 @@
                                         <a href="{{ route('order.ReportsIndex') }}" class="nav-link">Order Reports</a>
                                     </li>
                                 @endcan
+
+                                @can('manage report')
+                                <li class="nav-item">
+                                    <a href="{{ route('buffet.ReportsIndex') }}" class="nav-link">Buffet Reports</a>
+                                </li>
+                            @endcan
+
+                            @can('manage report')
+                            <li class="nav-item">
+                                <a href="{{ route('boardconsumption.ReportsIndex') }}" class="nav-link">Board Consumption Reports</a>
+                            </li>
+                        @endcan
 
                             </ul>
                         </div>

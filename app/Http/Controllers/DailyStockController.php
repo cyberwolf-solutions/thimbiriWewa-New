@@ -14,7 +14,7 @@ class DailyStockController extends Controller
     //
     public function index()
     {
-        $title = 'Kitchen Products';
+        $title = 'Daily Consumption';
 
         $breadcrumbs = [
             // ['label' => 'First Level', 'url' => '', 'active' => false],
@@ -22,7 +22,8 @@ class DailyStockController extends Controller
         ];
         //$data = Stock::all();
         $data = DailyStock::all();
-        return view('daily-stock.index', compact('title', 'breadcrumbs', 'data'));
+        $ingredientData = Ingredient::all();
+        return view('daily-stock.index', compact('title', 'breadcrumbs', 'data','ingredientData'));
     }
 
     public function create()
@@ -36,7 +37,8 @@ class DailyStockController extends Controller
         ];
         //$data = Stock::all();
         $data = Stock::all();
-        return view('daily-stock.create-edit', compact('title', 'breadcrumbs', 'data', 'is_edit'));
+        $ingredientData = Ingredient::all();
+        return view('daily-stock.create-edit', compact('title', 'breadcrumbs', 'data', 'is_edit','ingredientData'));
     }
 
     
@@ -68,7 +70,7 @@ class DailyStockController extends Controller
             $ingredient = Ingredient::find($request->ingredient);
 
             // Check if the stock exists for the selected ingredient
-            $stock = Stock::where('name', $ingredient->name)->first();
+            $stock = Ingredient::where('name', $ingredient->name)->first();
 
             if (!$stock) {
                 return response()->json(['success' => false, 'message' => 'Stock not found for this ingredient']);

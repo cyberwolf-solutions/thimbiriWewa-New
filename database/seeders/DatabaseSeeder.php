@@ -14,5 +14,7 @@ class DatabaseSeeder extends Seeder {
         $this->call(SettingsSeeder::class);
         $this->call(MailConfigSeeder::class);
         $this->call(PermissionSeeder::class);
+        $this->call(CategorySeeder::class);
+        $this->call(MealsSeeder::class);
     }
 }

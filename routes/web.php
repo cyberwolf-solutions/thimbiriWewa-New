@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BarController;
+use App\Http\Controllers\BoardConsumptionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerTypeController;
 use App\Http\Controllers\EmployeeController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\MealsController;
 use App\Http\Controllers\ModifiersController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\BuffetController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\RestaurantController;
@@ -24,6 +26,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BordingTypeCOntroller;
 use App\Http\Controllers\CheckinCheckoutController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomerBoardMealController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DailyStockController;
@@ -34,6 +37,7 @@ use App\Http\Controllers\RoomFacilityController;
 use App\Http\Controllers\RoomSizeController;
 use App\Http\Controllers\RoomTypesController;
 use App\Http\Controllers\StockController;
+use App\Models\CustomerBoardMeal;
 use App\Models\CustomerType;
 
 /*
@@ -77,6 +81,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/product', [ReportsController::class, 'product'])->name('product.ReportsIndex')->middleware('can:manage report');
     Route::get('/booking', [ReportsController::class, 'booking'])->name('booking.ReportsIndex')->middleware('can:manage report');
     Route::get('/order', [ReportsController::class, 'order'])->name('order.ReportsIndex')->middleware('can:manage report');
+    Route::get('/buffetreport', [ReportsController::class, 'buffet'])->name('buffet.ReportsIndex')->middleware('can:manage report');
+    Route::get('/boardcobsumptionreport', [ReportsController::class, 'boardcobsumption'])->name('boardconsumption.ReportsIndex')->middleware('can:manage report');
     Route::get('/search-by-type', [ReportsController::class, 'searchByType'])->name('search.by.type');
 
 
@@ -105,6 +111,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class)->middleware('can:manage products');
     Route::resource('meals', MealsController::class)->middleware('can:manage meals');
     Route::resource('modifiers', ModifiersController::class)->middleware('can:manage modifiers');
+    Route::resource('buffet', BuffetController::class)->middleware('can:manage modifiers');    
     // Route::resource('restaurant', RestaurantController::class)->middleware('can:manage pos');
     Route::resource('restaurant', RestaurantController::class);
 
@@ -189,8 +196,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/customer-type-add', [CustomerTypeController::class, 'store'])->name('customertype.add');
     Route::get('/customer-type-index', [CustomerTypeController::class, 'create'])->name('customertype.index');
     Route::delete('/customer-type-delete/{checkincheckout_id}', [CustomerTypeController::class, 'destroy'])->name('customerstype.destroy');
+    Route::delete('/buffet-delete/{checkincheckout_id}', [BuffetController::class, 'destroy'])->name('buffet.destroy');
+    Route::get('/buffet-edit/{checkincheckout_id}', [BuffetController::class, 'update'])->name('buffet.edit');
+    Route::post('/customer-buffet-meal', [CustomerBoardMealController::class, 'store'])->name('restaurantcheckoutcustomermeal');
 
-
+    Route::get('/buffet-consumption', [BuffetController::class, 'consumption'])->name('buffet_consumption');
+    Route::get('/board-consumption', [BoardConsumptionController::class, 'index'])->name('board_consumption');
+    Route::get('/board-consumption-edit/{id}', [BoardConsumptionController::class, 'edit'])->name('board_consumption.edit');
+    Route::get('/board-consumption-create', [BoardConsumptionController::class, 'create'])->name('boardconsumption.create');
+    Route::post('/board-consumption-add', [BoardConsumptionController::class, 'store'])->name('boardconsumption.store');
 
 
 
