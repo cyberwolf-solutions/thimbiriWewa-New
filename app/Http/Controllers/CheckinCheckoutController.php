@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BookingsRooms;
 use App\Models\Room;
 use App\Models\Booking;
 use App\Models\Customer;
@@ -9,9 +10,12 @@ use App\Models\BordingType;
 use Illuminate\Http\Request;
 use App\Models\RoomFacilities;
 use App\Models\checkincheckout;
+use App\Models\CustomerType;
+use App\Models\RoomPricing;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class CheckinCheckoutController extends Controller
 {
@@ -41,7 +45,7 @@ class CheckinCheckoutController extends Controller
         $customers = Customer::whereHas('bookings', function ($query) {
             $query->whereIn('status', ['OnGoing', 'Pending']);
         })->with('bookings.rooms')->get();
-        
+
 
         $is_edit = false;
         $data = Booking::whereIn('status', ['OnGoing', 'Pending'])->get();
@@ -52,18 +56,40 @@ class CheckinCheckoutController extends Controller
     }
 
     public function getBookingRooms($customerId)
-    {
-        $customer = Customer::with('bookings.rooms')->findOrFail($customerId);
+{
+    // Fetch the customer along with their bookings and rooms
+    $customer = Customer::with('bookings.rooms')->findOrFail($customerId);
 
-        return response()->json($customer->bookings);
-    }
+    // Get all booking rooms related to the bookings of this customer
+    $bookingRooms = BookingsRooms::whereIn('booking_id', $customer->bookings->pluck('id'))
+                               ->get(['booking_id', 'room_id', 'cost']); // Fetch necessary fields
+
+    // Attach booking room data (cost) to each booking and room
+    $customerBookings = $customer->bookings->map(function ($booking) use ($bookingRooms) {
+        // Attach the relevant room data to each room in the booking
+        $booking->rooms->each(function ($room) use ($booking, $bookingRooms) {
+            // Find the corresponding room's booking room entry using booking_id and room_id
+            $roomBooking = $bookingRooms->firstWhere('room_id', $room->id);
+
+            if ($roomBooking) {
+                // Add the 'cost' data from booking_rooms table to the room
+                $room->cost = $roomBooking->cost;
+            }
+        });
+
+        return $booking;
+    });
+
+    // Return the bookings data with attached room and cost information
+    return response()->json($customerBookings);
+}
+
 
 
     public function getRoomFacility($facilityId)
     {
 
         $facility = RoomFacilities::find($facilityId);
-
 
         if ($facility) {
 
@@ -76,7 +102,6 @@ class CheckinCheckoutController extends Controller
 
     public function store(Request $request)
     {
-        // Validate the incoming request data
         $validator = Validator::make($request->all(), [
             'customer_id' => 'required',
             'booking_id' => 'required',
@@ -85,8 +110,7 @@ class CheckinCheckoutController extends Controller
         ]);
 
         if ($validator->fails()) {
-            // If validation fails, return error messages
-            $all_errors = null;
+            $all_errors = '';
             foreach ($validator->errors()->messages() as $errors) {
                 foreach ($errors as $error) {
                     $all_errors .= $error . "<br>";
@@ -96,30 +120,64 @@ class CheckinCheckoutController extends Controller
         }
 
         try {
-            // Create a new Checkin record
-            // $customer = checkincheckout::create([
-            //     'booking_id' => $request->booking_id,
-            //     'customer_id' => $request->customer_id,
-            //     'room_type' => $request->booking_room_id,
-            //     'room_facility_type' => $request->room_facility,
-            //     'room_no' => $request->room_no,
-            //     'checkin' => $request->checkin,
-            //     'checkout' => $request->checkout,
-            //     'total_amount' => $request->total,
-            //     'paid_amount' => $request->payed,
-            //     'due_amount' => $request->due,
-            //     'boardingtype' => $request->bordingtype,
-            //     'created_by' => Auth::user()->id,
-            // ]);
             $roomsData = json_decode($request->rooms_data, true);
+            $booking = Booking::findOrFail($request->booking_id);
 
+            // Get customer type ID from name
+            $customerType = CustomerType::where('type', $booking->customer_type)->first();
 
-            Log::info("Room Data" , $roomsData);
-
-            // dd($roomsData);
+            if (!$customerType) {
+                Log::warning('Customer type not found', ['name' => $booking->customer_type]);
+                return response()->json([
+                    'success' => false,
+                    'message' => "Invalid customer type: {$booking->customer_type}"
+                ]);
+            }
 
             foreach ($roomsData as $roomData) {
-                $customer = checkincheckout::create([
+                Log::info('Processing Room Data', $roomData);
+
+                $checkin = Carbon::parse($roomData['checkin']);
+                $checkout = Carbon::parse($roomData['checkout']);
+                $days = $checkin->diffInDays($checkout);
+                if ($days == 0) $days = 1;
+
+                // Fetch room rate using ID, not name
+                $roomRate = RoomPricing::where('room_id', $roomData['roomId'])
+                    ->where('boarding_type_id', $booking->bording_type)
+                    ->where('customer_type_id', $customerType->id)
+                    ->where('currency', $booking->currency)
+                    ->first();
+
+                if (!$roomRate) {
+                    Log::warning('Room pricing not found', [
+                        'room_id' => $roomData['roomId'],
+                        'boarding_type_id' => $booking->bording_type,
+                        'customer_type_id' => $customerType->id,
+                        'currency' => $booking->currency
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Room pricing not found for Room ID {$roomData['roomId']}."
+                    ]);
+                }
+
+                $ratePerDay = $roomRate->rate; // Rate per day from RoomPricing
+                $subTotal = ($ratePerDay * $roomData['price']) / 100; // Subtotal based on rate per day and number of days
+
+                // Add the rate-per-day * number of days to the room price
+                $totalRoomPrice = $roomData['price'] + $subTotal; // Add the calculated price to the room's base price
+                $totalwithdays = $totalRoomPrice * $days;
+                $paidAmount = $roomData['paidAmount'] ?? 0;
+                $discount = $roomData['discount'] ?? 0;
+
+                // Calculate the total amount and due amount
+                $totalAmount = $totalwithdays - $discount;
+                $dueAmount = $totalAmount - $paidAmount;
+
+                // Create the checkincheckout record
+                checkincheckout::create([
                     'booking_id' => $request->booking_id,
                     'customer_id' => $request->customer_id,
                     'boardingtype' => $request->bordingtype,
@@ -129,29 +187,30 @@ class CheckinCheckoutController extends Controller
                     'room_facility_type' => $roomData['facility'],
                     'checkin' => $roomData['checkin'],
                     'checkout' => $roomData['checkout'],
-                    // 'price' => $roomData['price'],
-                    // 'boarding_price' => $roomData['boardingPrice'],
-                    'total_amount' => $roomData['totalCharge'],
-                    'paid_amount' => $roomData['paidAmount'],
-                    'due_amount' => $roomData['dueAmount'],
-                    'sub_total'=>0,
-                    'discount'=>0
+                    'total_amount' => $totalwithdays,
+                    'paid_amount' => $paidAmount,
+                    'due_amount' => $dueAmount,
+                    'sub_total' => $totalAmount,
+                    'discount' => $discount
                 ]);
             }
 
-
-            $booking =Booking::find($request->booking_id);
-            $booking->status= 'Complete';
+            $booking->status = 'Complete';
             $booking->save();
 
-            return json_encode(['success' => true, 'message' => 'Customer Checked In', 'url' => route('checkin.index')]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Customer Checked In',
+                'url' => route('checkin.index')
+            ]);
         } catch (\Throwable $th) {
-            Log::error('Error in CheckinCheckoutController store method: ' . $th->getMessage());
-            return json_encode(['success' => false, 'message' => 'Something went wrong!' . $th]);
-        }
-        
-    }
+            Log::error('Error in CheckinCheckoutController store method: ' . $th->getMessage(), [
+                'trace' => $th->getTraceAsString()
+            ]);
 
+            return response()->json(['success' => false, 'message' => 'Something went wrong! ' . $th->getMessage()]);
+        }
+    }
 
 
 

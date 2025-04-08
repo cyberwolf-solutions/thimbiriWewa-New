@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->integer('booking_id');
             $table->integer('room_id');
+            $table->integer('days');
+            $table->float('rate');
+            $table->float('cost');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();

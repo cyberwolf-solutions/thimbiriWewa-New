@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->integer('customer_id');
             $table->string('customer_type');
             $table->string('bording_type');
+            $table->string('currency');
             $table->string('checkin');
             $table->string('checkout');
             $table->integer('no_of_adults')->default(0);
