@@ -14,6 +14,7 @@ class Booking extends Model {
         'customer_id',
         'customer_type',
         'bording_type',
+        'currency',
         'checkin',
         'checkout',
         'no_of_adults',

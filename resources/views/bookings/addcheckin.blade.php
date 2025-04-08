@@ -63,18 +63,18 @@
 
                         </div>
                         @if (!$is_edit)
-                        <div class="col-md-6 mb-3 required ">
-                            <label for="" class="form-label">Booking Id</label>
-                            <input type="text" name="booking_id" id="booking_id" class="form-control"
-                                placeholder="Room Facility" required readonly />
-                        </div>
-                    @endif
+                            <div class="col-md-6 mb-3 required ">
+                                <label for="" class="form-label">Booking Id</label>
+                                <input type="text" name="booking_id" id="booking_id" class="form-control"
+                                    placeholder="Room Facility" required readonly />
+                            </div>
+                        @endif
                         <div class="col-md-6 mb-3 required">
                             <label for="" class="form-label">Boarding Type</label>
-                            <input type="text" name="bordingtype" id="boarding_type" id="boarding_type"  class="form-control"
-                            placeholder="Boarding Price"
-                            value="{{ $is_edit ? $boarding->firstWhere('id', $data->boardingtype)->price ?? '' : '' }}"
-                            required readonly />
+                            <input type="text" name="bordingtype" id="boarding_type" id="boarding_type"
+                                class="form-control" placeholder="Boarding Price"
+                                value="{{ $is_edit ? $boarding->firstWhere('id', $data->boardingtype)->price ?? '' : '' }}"
+                                required readonly />
 
                         </div>
                         <div class="col-md-6 mb-3 required" style="display: none">
@@ -84,7 +84,7 @@
                                 value="{{ $is_edit ? $boarding->firstWhere('id', $data->boardingtype)->price ?? '' : '' }}"
                                 required readonly />
                         </div>
-                       
+
                         @if (!$is_edit)
                             <div class="col-md-6 mb-3 required">
                                 <label for="" class="form-label">Booking Rooms</label>
@@ -123,12 +123,7 @@
                                     value="{{ $is_edit ? $data->checkin : '' }}" placeholder="Check In Date" required
                                     readonly />
                             </div>
-                            {{-- <div class="col-md-6 mb-3 required">
-                            <label for="" class="form-label">Check Out Date</label>
-                            <input type="text" name="checkout" id="checkout" class="form-control"
-                                value="{{ $is_edit ? $data->checkout : '' }}" placeholder="Check In Date" required
-                                readonly />
-                        </div> --}}
+                          
                             <div class="col-md-6 mb-3 required">
                                 <label for="" class="form-label">Check Out Date</label>
                                 <input type="text" name="checkout" id="checkout" class="form-control"
@@ -174,11 +169,7 @@
                                     placeholder="Total" required readonly />
                             </div>
 
-                            {{-- <div class="col-md-6 mb-3 required">
-                            <label for="" class="form-label">Full Charge</label>
-                            <input type="text" name="full" id="full" class="form-control"
-                                value="{{ $is_edit ? $data->room_no : '' }}" placeholder="Total" required readonly />
-                        </div> --}}
+                          
 
 
                             <div class="col-md-6 mb-3 required">
@@ -269,41 +260,21 @@
         });
     </script>
 
-
-    <script>
-        // $(document).ready(function() {
-        //     // Disable the Booking Room Selector initially
-        //     const boardingType = $('#boarding_type').val();
-        //     if (!boardingType) {
-        //         $('#booking-room-select').prop('disabled', true);
-        //     }
-
-        //     // Enable or disable the Booking Room Selector based on Boarding Type selection
-        //     $('#boarding_type').change(function() {
-        //         const selectedBoardingType = $(this).val();
-        //         if (selectedBoardingType) {
-        //             // Enable the Booking Room Selector
-        //             $('#booking-room-select').prop('disabled', false);
-        //         } else {
-        //             // Disable the Booking Room Selector
-        //             $('#booking-room-select').prop('disabled', true);
-        //         }
-        //     });
-        // });
-    </script>
     <script>
         $(document).ready(function() {
             // Add a new room to the table and update the dropdown
             $('#booking-room-select').change(function() {
                 const selectedOption = $(this).find(':selected');
+                
                 const roomId = selectedOption.val(); // Room ID
+             
                 var roomNo = selectedOption.data('room-no'); // Room Name
                 const facilityId = selectedOption.data('facility-id');
                 const checkin = selectedOption.data('checkin');
                 const checkout = selectedOption.data('checkout');
                 const roomPrice = parseFloat(selectedOption.data('total-ammount')) || 0;
                 const boardingPrice = parseFloat($('#boarding_price').val()) || 0;
-
+                alert(roomPrice);
                 if ($('#rooms-table tbody').find(`tr[data-room-id="${roomId}"]`).length > 0) {
                     alert("This room has already been added.");
                     return; // Exit function to prevent adding the same room again
@@ -320,9 +291,6 @@
                     // Initialize paid amount and due amount
                     const paidAmount = parseFloat($('#payed').val()) || 0;
                     const dueAmount = totalCharge - paidAmount;
-
-
-
 
                     // Append data to the table
                     $.ajax({
@@ -372,10 +340,6 @@
 
             });
 
-
-
-
-
             function calculateTotalChargesAndDue() {
                 let totalCharges = 0;
                 let totalDue = 0;
@@ -416,7 +380,8 @@
 
 
         });
-    </script>
+   
+   </script>
 
     <script>
         $(document).ready(function() {
@@ -463,11 +428,6 @@
             });
         });
     </script>
-
-
-
-
-
 
     <script>
         document.getElementById('boarding_type').addEventListener('change', function() {
@@ -554,180 +514,86 @@
         });
     </script>
 
-
-
-
     <script>
-        $(document).ready(function() {
-            $('#customer-select').change(function() {
-                var customerId = $(this).val();
+      $(document).ready(function() {
+    $('#customer-select').change(function() {
+        var customerId = $(this).val();
 
-                // Send AJAX request to fetch booking rooms
-                $.ajax({
-                    url: '/get-booking-rooms/' + customerId,
-                    type: 'GET',
-                    success: function(response) {
-                        $('#booking-room-select').empty();
-                        $('#responseContainer').html(JSON.stringify(response));
+        // Send AJAX request to fetch booking rooms
+        $.ajax({
+            url: '/get-booking-rooms/' + customerId,
+            type: 'GET',
+            success: function(response) {
+                $('#booking-room-select').empty();
+                $('#responseContainer').html(JSON.stringify(response));
 
-                        $('#booking-room-select').append($('<option>', {
-                            value: '',
-                            text: 'Select Room'
-                        }));
+                $('#booking-room-select').append($('<option>', {
+                    value: '',
+                    text: 'Select Room'
+                }));
 
+                if (response.length > 0) {
+                    $.each(response, function(index, booking) {
+                        $.each(booking.rooms, function(index, room) {
+                            // Extract the cost from the booking_rooms data
+                            var roomCost = 0;
+                            if (room.bookingRooms && room.bookingRooms.length > 0) {
+                                roomCost = room.bookingRooms[0].cost; // Assuming there is only one booking room per booking
+                            }
 
-                        if (response.length > 0) {
-                            $.each(response, function(index, booking) {
-                                $.each(booking.rooms, function(index, room) {
-                                    $('#booking-room-select').append($(
-                                        '<option>', {
-                                            value: room.id,
-                                            text: room.name + ' | ' +
-                                                room.room_no,
-                                            'data-total-ammount': room
-                                                .price,
-                                            'data-room-no': room
-                                                .room_no,
-                                            'data-facility-id': room
-                                                .RoomFacility_id,
-                                            'data-checkin': booking
-                                                .checkin,
-                                            'data-checkout': booking
-                                                .checkout,
-                                            'data-id': booking
-                                                .id
-                                        }));
-                                });
-                            });
-                        } else {
-                            // If no booking rooms found
-                            $('#booking-room-select').append($('<option>', {
-                                value: '',
-                                text: 'No booking rooms available'
-                            }));
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
-
-
-
-            $('#booking-room-select').change(function() {
-                var facilityId = $(this).find(':selected').data('facility-id');
-
-                // Send AJAX request to fetch room facility
-                $.ajax({
-                    url: '/get-room-facility/' + facilityId,
-                    type: 'GET',
-                    success: function(response) {
-                        $('#room-facility').val(response.name);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
-            $('#booking-room-select').change(function() {
-                var Id = $(this).find(':selected').data('id');
-                $('#booking_id').val(Id);
-            });
-            $('#booking-room-select').change(function() {
-                var roomNo = $(this).find(':selected').data('room-no');
-                $('#room-no').val(roomNo);
-            });
-            $('#booking-room-select').change(function() {
-                var totalAmount = $(this).find(':selected').data('total-ammount');
-                $('#total1').val(totalAmount);
-            });
-            $('#booking-room-select').change(function() {
-                var checkinDate = $(this).find(':selected').data('checkin');
-                // alert('Check-in Date:', checkinDate);
-                $('#checkin').val(checkinDate);
-            });
-            $('#booking-room-select').change(function() {
-                var checkiOutDate = $(this).find(':selected').data('checkout');
-                // alert('Check-in Date:', checkinDate);
-                $('#checkout').val(checkiOutDate);
-            });
-
-
-
-
-
-
-
-
-            $(document).ready(function() {
-                // Function to calculate due amount
-                function calculateDue() {
-                    var total = parseFloat($('#total').val());
-                    var payed = parseFloat($('#payed').val());
-
-
-                    var due = total - payed;
-
-
-                    $('#due').val(due.toFixed(2));
+                            $('#booking-room-select').append($(
+                                '<option>', {
+                                    value: room.id,
+                text: room.name + ' | ' + room.room_no,
+                'data-total-ammount': room.cost, // Attach the cost here
+                'data-room-no': room.room_no,
+                'data-facility-id': room.RoomFacility_id,
+                'data-checkin': booking.checkin,
+                'data-checkout': booking.checkout,
+                'data-id': booking.id
+                                }));
+                        });
+                    });
+                } else {
+                    // If no booking rooms found
+                    $('#booking-room-select').append($('<option>', {
+                        value: '',
+                        text: 'No booking rooms available'
+                    }));
                 }
-
-
-                $('#payed').on('input', function() {
-                    calculateDue();
-                });
-
-
-                // calculateDue();
-            });
-
-
-
-            $('#booking-room-select').change(function() {
-                var totalAmountPerDay = parseFloat($(this).find(':selected').data('total-ammount'));
-                var checkinDate = $(this).find(':selected').data('checkin');
-                var checkoutDate = $(this).find(':selected').data('checkout');
-
-                $('#checkin').val(checkinDate);
-                $('#checkout').val(checkoutDate);
-
-
-                var checkin = new Date(checkinDate);
-                var checkout = new Date(checkoutDate);
-
-
-                var differenceMs = checkout - checkin;
-
-                var differenceDays = differenceMs / (1000 * 60 * 60 * 24);
-
-                var totalAmountForDays = totalAmountPerDay * differenceDays;
-
-                // Set the value of the total amount field
-                // $('#total').val(totalAmountForDays.toFixed(2));
-                // $('#total').val(Math.round(totalAmountForDays));
-
-
-                // Get the boarding price for the stay
-                var boardingPrice = parseFloat($('#boarding_price_sum').val()) ||
-                    0; // Default to 0 if empty
-
-                // Calculate the final total by adding boarding price
-                var finalTotal = totalAmountForDays + boardingPrice;
-
-                //alert(finalTotal).value;
-
-                // Set the value of the total amount field
-                $('#total').val(Math.round(finalTotal));
-
-
-
-
-                // alert('The difference between check-in and check-out dates is ' + differenceDays +
-                // ' days.');
-            });
-
-
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
         });
-    </script>
+    });
+
+    // Handle other changes as before (room-facility, due calculation, etc.)
+    $('#booking-room-select').change(function() {
+        var totalAmount = $(this).find(':selected').data('total-ammount');
+        $('#total1').val(totalAmount);
+    });
+    $('#booking-room-select').change(function() {
+        var checkinDate = $(this).find(':selected').data('checkin');
+        $('#checkin').val(checkinDate);
+    });
+    $('#booking-room-select').change(function() {
+        var checkoutDate = $(this).find(':selected').data('checkout');
+        $('#checkout').val(checkoutDate);
+    });
+
+    // Calculate the due amount based on the 'total' and 'paid' fields
+    function calculateDue() {
+        var total = parseFloat($('#total').val());
+        var payed = parseFloat($('#payed').val());
+        var due = total - payed;
+        $('#due').val(due.toFixed(2));
+    }
+
+    $('#payed').on('input', function() {
+        calculateDue();
+    });
+});
+
+   </script>
 @endsection
