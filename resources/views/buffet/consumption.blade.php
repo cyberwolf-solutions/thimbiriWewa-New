@@ -38,13 +38,17 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Breakfast buffet (outside customers)</th>
-                                <th>Lunch buffet (outside customers)</th>
-                                <th>Dinner buffet (outside customers)</th>
                                 <th>Breakfast buffet (checked in customers)</th>
-                                <th>Lunch buffet (checked in customers)</th>
-                                <th>Dinner buffet (checked in customers)</th>
                                 <th>Breakfast buffet (Total)</th>
+                                <th>Lunch buffet (outside customers)</th>
+                                <th>Lunch buffet (checked in customers)</th>
                                 <th>Lunch buffet (Total)</th>
+                                <th>Dinner buffet (outside customers)</th>
+                              
+                               
+                                <th>Dinner buffet (checked in customers)</th>
+                              
+                             
                                 <th>Dinner buffet (Total)</th>
                             </tr>
                         </thead>

@@ -63,13 +63,13 @@
                                         class="mdi mdi-silverware label-icon align-middle fs-16 me-2"></i> Kitchen</a>
                             </div>
                         @endcan
-                        @can('manage bar')
+                        {{-- @can('manage bar')
                             <div class="col">
                                 <a href="{{ route('bar.index') }}" target="_blank" type="button"
                                     class="btn btn-soft-secondary btn-label waves-effect waves-light form-control"><i
                                         class="mdi mdi-glass-cocktail label-icon align-middle fs-16 me-2"></i> Bar</a>
                             </div>
-                        @endcan
+                        @endcan --}}
                         <div class="col">
                             <button type="button"
                                 class="btn btn-soft-success btn-label waves-effect waves-light form-control"
